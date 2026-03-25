@@ -1,0 +1,14 @@
+<view class="picker-shell card">
+  <view wx:if="{{imagePath}}" class="preview-shell">
+    <image class="preview-image" src="{{imagePath}}" mode="aspectFill"></image>
+  </view>
+  <view wx:else class="placeholder-shell">
+    <text class="placeholder-title">上传菜单照片</text>
+    <text class="placeholder-subtitle">可以直接拍照，或从相册选择</text>
+  </view>
+
+  <view class="picker-actions">
+    <button class="picker-button strong" bindtap="chooseFromCamera">拍照识别</button>
+    <button class="picker-button" bindtap="chooseFromAlbum">相册导入</button>
+  </view>
+</view>

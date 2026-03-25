@@ -1,0 +1,7 @@
+<view wx:if="{{visible}}" class="mask">
+  <view class="mask-card">
+    <view class="spinner"></view>
+    <text class="mask-title">{{title}}</text>
+    <text wx:if="{{subtitle}}" class="mask-subtitle">{{subtitle}}</text>
+  </view>
+</view>

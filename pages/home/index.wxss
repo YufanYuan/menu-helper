@@ -1,0 +1,40 @@
+.hero {
+  padding: 18rpx 8rpx 24rpx;
+}
+
+.hero-copy {
+  flex: 1;
+}
+
+.hero-title {
+  display: block;
+  font-size: 52rpx;
+  font-weight: 700;
+  line-height: 1.14;
+}
+
+.settings-card {
+  margin-top: 24rpx;
+  padding: 28rpx;
+}
+
+.picker-row {
+  margin-top: 22rpx;
+  padding: 26rpx 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 24rpx;
+  background: rgba(24, 33, 38, 0.05);
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.picker-arrow {
+  color: #6f786d;
+}
+
+.action-button {
+  margin-top: 24rpx;
+  width: 100% !important;
+}

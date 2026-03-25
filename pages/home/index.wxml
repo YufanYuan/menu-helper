@@ -1,0 +1,32 @@
+<navigation-bar title="菜单助手" back="{{false}}" color="#182126" background="transparent"></navigation-bar>
+
+<view class="page-shell">
+  <view class="hero">
+    <view class="hero-copy">
+      <text class="hero-title">拍下菜单，轻松看懂并完成点餐</text>
+    </view>
+  </view>
+
+  <view class="page-body">
+    <image-picker imagePath="{{imagePath}}" bind:selected="handleImageSelected"></image-picker>
+
+    <view class="card settings-card">
+      <view>
+        <text class="section-title">翻译语言</text>
+        <text class="section-subtitle">识别结果将优先显示为该语言</text>
+      </view>
+      <picker mode="selector" range="{{languageOptions}}" value="{{selectedLanguageIndex}}" bindchange="handleLanguageChange">
+        <view class="picker-row">
+          <text>{{languageOptions[selectedLanguageIndex]}}</text>
+          <text class="picker-arrow">></text>
+        </view>
+      </picker>
+    </view>
+
+    <button class="primary-button action-button {{!imagePath ? 'disabled' : ''}}" bindtap="handleRecognize">
+      识别菜单
+    </button>
+  </view>
+</view>
+
+<loading-mask visible="{{isAnalyzing}}" title="{{loadingTitle}}" subtitle="{{loadingSubtitle}}"></loading-mask>

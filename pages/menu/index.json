@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "navigation-bar": "/components/navigation-bar/navigation-bar",
+    "menu-item-card": "/components/menu-item-card/menu-item-card",
+    "cart-bar": "/components/cart-bar/cart-bar"
+  }
+}

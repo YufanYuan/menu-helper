@@ -1,0 +1,8 @@
+<view class="cart-bar {{disabled ? 'disabled' : ''}}">
+  <view class="cart-meta">
+    <text class="cart-count">已选 {{totalCount}} 份</text>
+    <text class="cart-price">合计 {{totalPriceLabel}}</text>
+  </view>
+  <view style="flex: 1;"></view>
+  <button class="cart-action" bindtap="handleTap">{{actionText}}</button>
+</view>

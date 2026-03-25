@@ -1,0 +1,38 @@
+<view class="screen">
+  <navigation-bar title="确认点餐内容" color="#182126" background="transparent"></navigation-bar>
+
+  <view class="page-shell">
+    <view wx:if="{{items.length}}" class="page-body">
+      <view class="card total-card">
+        <text class="section-title">已选 {{totalCount}} 份菜品</text>
+        <text class="total-price">合计 {{totalPriceLabel}}</text>
+        <text class="section-subtitle">确认菜品和数量后，即可生成给服务员看的点单卡。</text>
+      </view>
+
+      <scroll-view scroll-y="{{true}}" class="preview-list">
+        <block wx:for="{{items}}" wx:key="id">
+          <view class="card preview-item">
+            <view class="preview-copy">
+              <text class="preview-name">{{item.originalName}}</text>
+              <text wx:if="{{item.translatedName}}" class="preview-translated">{{item.translatedName}}</text>
+              <text class="preview-price">{{item.priceLabel}} · 小计 {{item.subtotalLabel}}</text>
+            </view>
+            <quantity-stepper
+              value="{{item.quantity}}"
+              data-item-id="{{item.id}}"
+              bind:change="handleQuantityChange"
+            ></quantity-stepper>
+          </view>
+        </block>
+      </scroll-view>
+
+      <button class="primary-button confirm-button" bindtap="handleConfirm">生成点单卡</button>
+    </view>
+
+    <view wx:else class="card empty-shell">
+      <text class="section-title">还没有已选菜品</text>
+      <text class="section-subtitle">回到菜单页先选菜，再来确认点餐内容。</text>
+      <button class="primary-button empty-button" bindtap="handleBackToMenu">返回菜单</button>
+    </view>
+  </view>
+</view>

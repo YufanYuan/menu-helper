@@ -1,0 +1,102 @@
+page {
+  height: 100vh;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.page-shell {
+  flex: 1;
+  min-height: 0;
+  padding: 16rpx;
+}
+
+.page-body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.total-card {
+  padding: 30rpx 28rpx;
+}
+
+.total-price {
+  display: block;
+  margin-top: 18rpx;
+  font-size: 56rpx;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.preview-list {
+  margin-top: 24rpx;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  overflow: hidden;
+}
+
+.preview-item {
+  padding: 28rpx;
+  margin-bottom: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+}
+
+.preview-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.preview-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.preview-translated {
+  display: block;
+  margin-top: 8rpx;
+  color: #9d5a36;
+  font-size: 24rpx;
+}
+
+.preview-price {
+  display: block;
+  margin-top: 12rpx;
+  color: #5e655f;
+  font-size: 24rpx;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+quantity-stepper {
+  flex: none;
+  width: 250rpx;
+}
+
+.confirm-button {
+  margin-top: 28rpx;
+  flex: none;
+  width: 100% !important;
+}
+
+.empty-shell {
+  margin-top: 80rpx;
+  padding: 36rpx 28rpx;
+}
+
+.empty-button {
+  margin-top: 28rpx;
+}

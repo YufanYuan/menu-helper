@@ -1,0 +1,36 @@
+.stepper {
+  display: flex;
+  flex-shrink: 1;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14rpx;
+}
+
+.stepper-button {
+  width: 68rpx;
+  height: 68rpx;
+  border-radius: 20rpx;
+  background: rgba(24, 33, 38, 0.08);
+  color: #182126;
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.stepper-button.filled {
+  background: #182126;
+  color: #fffaf0;
+}
+
+.stepper-value {
+  min-width: 72rpx;
+  height: 68rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20rpx;
+  background: rgba(24, 33, 38, 0.04);
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  flex: none;
+}

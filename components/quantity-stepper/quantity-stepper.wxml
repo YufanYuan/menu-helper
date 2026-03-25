@@ -1,0 +1,7 @@
+<view class="stepper">
+  <button class="stepper-button" bindtap="handleMinus">-</button>
+  <view class="stepper-value">
+    <text>{{value}}</text>
+  </view>
+  <button class="stepper-button filled" bindtap="handlePlus">+</button>
+</view>

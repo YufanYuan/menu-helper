@@ -1,0 +1,35 @@
+<view class="screen">
+  <navigation-bar title="点单卡" color="#182126" background="transparent"></navigation-bar>
+
+  <view class="page-shell">
+    <view wx:if="{{items.length}}" class="page-body">
+      <view class="card hero-card">
+        <text class="section-title">向服务员出示此页即可点餐</text>
+        <text class="section-subtitle">默认显示当地语言，方便服务员确认；你也可以切换为自己的语言再次核对。</text>
+        <view class="switch-row">
+          <language-switch value="{{displayMode}}" options="{{switchOptions}}" bind:change="handleModeChange"></language-switch>
+        </view>
+      </view>
+
+      <view class="card order-sheet">
+        <text class="sheet-header">We would like to order the following dishes:</text>
+        <view class="sheet-list">
+          <block wx:for="{{items}}" wx:key="id">
+            <view class="sheet-item">
+              <text class="sheet-quantity">{{item.quantity}} x</text>
+              <text class="sheet-name">{{item.displayName}}</text>
+            </view>
+          </block>
+        </view>
+      </view>
+
+      <button class="secondary-button action-button" bindtap="handleCopy">复制点单内容</button>
+    </view>
+
+    <view wx:else class="card empty-shell">
+      <text class="section-title">当前没有可展示的点单内容</text>
+      <text class="section-subtitle">返回确认页，先核对你选中的菜品。</text>
+      <button class="primary-button empty-button" bindtap="handleBackToPreview">返回确认页</button>
+    </view>
+  </view>
+</view>

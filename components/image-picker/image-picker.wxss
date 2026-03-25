@@ -1,0 +1,61 @@
+.picker-shell {
+  padding: 28rpx;
+}
+
+.preview-shell {
+  height: 400rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  background: #e8ded0;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+}
+
+.placeholder-shell {
+  height: 400rpx;
+  border: 2rpx dashed rgba(24, 33, 38, 0.18);
+  border-radius: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background:
+    radial-gradient(circle at top left, rgba(157, 90, 54, 0.18), transparent 34%),
+    linear-gradient(135deg, rgba(255, 250, 240, 0.9), rgba(244, 236, 223, 0.95));
+}
+
+.placeholder-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.placeholder-subtitle {
+  margin-top: 14rpx;
+  color: #5e655f;
+  font-size: 24rpx;
+}
+
+.picker-actions {
+  margin-top: 24rpx;
+  display: flex;
+  gap: 16rpx;
+}
+
+.picker-button {
+  flex: 1;
+  min-height: 88rpx;
+  border-radius: 999rpx;
+  background: rgba(24, 33, 38, 0.06);
+  color: #182126;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.picker-button.strong {
+  background: #182126;
+  color: #fffaf0;
+}

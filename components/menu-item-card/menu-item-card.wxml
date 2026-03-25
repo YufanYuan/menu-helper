@@ -1,0 +1,18 @@
+<view class="menu-card card">
+  <view class="menu-card-top">
+    <view class="menu-copy">
+      <text class="menu-original">{{item.originalName}}</text>
+      <text wx:if="{{item.translatedName}}" class="menu-translated">{{item.translatedName}}</text>
+      <text wx:if="{{item.descriptionTranslated}}" class="menu-description">{{item.descriptionTranslated}}</text>
+      <text wx:elif="{{item.descriptionOriginal}}" class="menu-description">{{item.descriptionOriginal}}</text>
+    </view>
+    <text class="menu-price">{{item.priceLabel}}</text>
+  </view>
+
+  <view class="menu-card-bottom">
+    <view class="menu-meta">
+      <text class="menu-category">{{item.category}}</text>
+    </view>
+    <quantity-stepper value="{{quantity}}" bind:change="handleQuantityChange"></quantity-stepper>
+  </view>
+</view>

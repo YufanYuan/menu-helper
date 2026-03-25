@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "navigation-bar": "/components/navigation-bar/navigation-bar",
+    "quantity-stepper": "/components/quantity-stepper/quantity-stepper"
+  }
+}
