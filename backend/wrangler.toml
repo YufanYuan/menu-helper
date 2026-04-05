@@ -1,0 +1,11 @@
+name = "menu-helper-openrouter-proxy"
+main = "src/index.ts"
+compatibility_date = "2026-04-05"
+workers_dev = true
+
+[vars]
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+
+[[analytics_engine_datasets]]
+binding = "MENU_BINDING"
+dataset = "menu_translate_analytics"

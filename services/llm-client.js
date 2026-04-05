@@ -1,126 +1,106 @@
 const env = require('../config/env')
 const { parseStructuredPayload } = require('../utils/json')
 
-function requestOpenRouterStructuredChatCompletion({ messages, schema, schemaName }) {
-  const config = env.openrouter || {}
+function loginWithWeChat() {
   return new Promise((resolve, reject) => {
-    if (!config.apiUrl || !config.apiKey || !config.models) {
-      reject(new Error('OpenRouter 配置不完整，请检查 config/env.js'))
-      return
-    }
-
-    const data = {
-      models: config.models || [],
-      messages,
-      response_format: {
-        type: 'json_schema',
-        json_schema: {
-          name: schemaName,
-          schema,
-          strict: true,
-        },
-      },
-      provider: {
-        require_parameters: true,
-      },
-      structured_outputs: true,
-    }
-
-    wx.request({
-      url: config.apiUrl,
-      method: 'POST',
-      timeout: env.requestTimeout,
-      header: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.apiKey}`,
-        'HTTP-Referer': config.appUrl,
-        'X-Title': config.appName,
-      },
-      data,
+    wx.login({
       success: (res) => {
-        if (res.statusCode < 200 || res.statusCode >= 400) {
-          const message =
-            (res.data && res.data.error && res.data.error.message) ||
-            (res.data && res.data.message) ||
-            `LLM 请求失败: ${res.statusCode}`
-          reject(new Error(message))
+        if (!res.code) {
+          reject(new Error('微信登录失败，未获取到 code'))
           return
         }
 
-        const content = extractChatCompletionText(res.data)
-
-        if (!content) {
-          reject(new Error('LLM 返回为空'))
-          return
-        }
-
-        try {
-          resolve(parseStructuredPayload(content))
-        } catch (error) {
-          reject(error)
-        }
+        resolve(res.code)
       },
-      fail: reject,
+      fail: () => {
+        reject(new Error('微信登录失败，请稍后重试'))
+      },
     })
   })
 }
 
-function requestArkStructuredResponse({ input, schema, schemaName }) {
-  const config = env.ark || {}
-  return new Promise((resolve, reject) => {
-    if (!config.apiUrl || !config.apiKey || !config.model) {
-      reject(new Error('Ark 配置不完整，请检查 config/env.js'))
-      return
-    }
+function requestStructuredChatCompletion({ messages, schema, schemaName }) {
+  const config = env.cloudflare || {}
+  const hasModels = Array.isArray(config.models) && config.models.length > 0
 
-    const data = {
-      model: config.model,
-      input,
-      text: {
-        format: {
-          type: 'json_schema',
-          name: schemaName,
-          schema,
-          strict: true,
-        },
-      },
-    }
+  if (!config.apiUrl || (!config.model && !hasModels)) {
+    return Promise.reject(new Error('Cloudflare API 配置不完整，请检查 config/env.js'))
+  }
 
-    wx.request({
-      url: config.apiUrl,
-      method: 'POST',
-      timeout: env.requestTimeout,
-      header: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.apiKey}`,
-      },
-      data,
-      success: (res) => {
-        if (res.statusCode < 200 || res.statusCode >= 300) {
-          const message =
-            (res.data && res.data.error && res.data.error.message) ||
-            (res.data && res.data.message) ||
-            `LLM 请求失败: ${res.statusCode}`
-          reject(new Error(message))
-          return
+  return loginWithWeChat().then(
+    (wechatCode) =>
+      new Promise((resolve, reject) => {
+        const data = {
+          wechat_code: wechatCode,
+          messages,
+          stream: false,
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: schemaName,
+              schema,
+              strict: true,
+            },
+          },
+          provider: {
+            require_parameters: true,
+          },
+          structured_outputs: true,
         }
 
-        const content = extractArkResponseText(res.data)
-
-        if (!content) {
-          reject(new Error('LLM 返回为空'))
-          return
+        if (hasModels) {
+          data.models = config.models
+        } else {
+          data.model = config.model
         }
 
-        try {
-          resolve(parseStructuredPayload(content))
-        } catch (error) {
-          reject(error)
+        if (typeof config.temperature === 'number') {
+          data.temperature = config.temperature
         }
-      },
-      fail: reject,
-    })
-  })
+
+        if (typeof config.maxTokens === 'number') {
+          data.max_tokens = config.maxTokens
+        }
+
+        wx.request({
+          url: config.apiUrl,
+          method: 'POST',
+          timeout: env.requestTimeout,
+          header: {
+            'Content-Type': 'application/json',
+          },
+          data,
+          success: (res) => {
+            const body = res.data || {}
+
+            if (res.statusCode < 200 || res.statusCode >= 300 || body.success === false) {
+              const message =
+                (body.error && body.error.message) ||
+                body.message ||
+                `LLM 请求失败: ${res.statusCode}`
+              reject(new Error(message))
+              return
+            }
+
+            const content = extractChatCompletionText(body.data)
+
+            if (!content) {
+              reject(new Error('LLM 返回为空'))
+              return
+            }
+
+            try {
+              resolve(parseStructuredPayload(content))
+            } catch (error) {
+              reject(error)
+            }
+          },
+          fail: () => {
+            reject(new Error('请求 Cloudflare API 失败，请检查网络或域名白名单'))
+          },
+        })
+      }),
+  )
 }
 
 function extractChatCompletionText(response) {
@@ -170,43 +150,6 @@ function extractChatCompletionText(response) {
   return ''
 }
 
-function extractArkResponseText(response) {
-  if (!response) {
-    return ''
-  }
-
-  if (typeof response.output_text === 'string' && response.output_text.trim()) {
-    return response.output_text.trim()
-  }
-
-  if (Array.isArray(response.output)) {
-    const text = response.output
-      .flatMap((item) => item.content || [])
-      .map((item) => {
-        if (typeof item.text === 'string') {
-          return item.text
-        }
-        if (typeof item.arguments === 'string') {
-          return item.arguments
-        }
-        return ''
-      })
-      .join('')
-      .trim()
-
-    if (text) {
-      return text
-    }
-  }
-
-  if (typeof response.text === 'string' && response.text.trim()) {
-    return response.text.trim()
-  }
-
-  return ''
-}
-
 module.exports = {
-  requestOpenRouterStructuredChatCompletion,
-  requestArkStructuredResponse,
+  requestStructuredChatCompletion,
 }

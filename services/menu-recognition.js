@@ -1,11 +1,9 @@
 const env = require('../config/env')
 const {
-  requestOpenRouterStructuredChatCompletion,
-  requestArkStructuredResponse,
+  requestStructuredChatCompletion,
 } = require('./llm-client')
 const {
   buildMenuRecognitionMessages,
-  buildMenuRecognitionInput,
   buildMenuRecognitionSchema,
 } = require('../utils/prompts')
 const { normalizeMenuPayload } = require('../domain/menu')
@@ -233,27 +231,13 @@ async function recognizeMenu({ imageBase64, mimeType, userLanguage }) {
 }
 
 async function requestMenuExtraction({ imageBase64, mimeType, userLanguage, schema }) {
-  if (env.llmProvider === 'ark') {
-    const input = buildMenuRecognitionInput({
-      imageBase64,
-      mimeType,
-      userLanguageLabel: userLanguage,
-    })
-
-    return requestArkStructuredResponse({
-      input,
-      schema,
-      schemaName: 'menu_extraction',
-    })
-  }
-
   const messages = buildMenuRecognitionMessages({
     imageBase64,
     mimeType,
     userLanguageLabel: userLanguage,
   })
 
-  return requestOpenRouterStructuredChatCompletion({
+  return requestStructuredChatCompletion({
     messages,
     schema,
     schemaName: 'menu_extraction',
