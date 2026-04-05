@@ -1,5 +1,11 @@
 <view class="screen">
-  <navigation-bar title="菜单浏览" color="#182126" background="transparent"></navigation-bar>
+  <navigation-bar
+    title="菜单浏览"
+    color="#182126"
+    background="transparent"
+    delta="{{0}}"
+    bind:back="handleBackAttempt"
+  ></navigation-bar>
 
   <view class="page-shell">
     <view wx:if="{{hasMenu}}" class="page-body">

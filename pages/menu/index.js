@@ -55,16 +55,16 @@ Page({
       return
     }
 
-    this.resetMenuScrollTop()
     this.refreshData()
     this.updateMenuListHeight()
   },
 
-  refreshData() {
+  refreshData(nextCategory) {
     const session = sessionStore.getState()
     const settings = settingsStore.getState()
     const categories = buildCategories(session.items)
-    const activeCategory = categories.includes(this.data.activeCategory) ? this.data.activeCategory : ALL_CATEGORY
+    const currentCategory = nextCategory || this.data.activeCategory
+    const activeCategory = categories.includes(currentCategory) ? currentCategory : ALL_CATEGORY
     const summary = sessionStore.getSummary()
     const items = filterItemsByCategory(session.items, activeCategory).map((item) => ({
       ...item,
@@ -83,21 +83,23 @@ Page({
       items,
       totalCount: summary.totalCount,
       totalPriceLabel: buildTotalPriceLabel(summary.totalPrice, session.currency),
-      menuScrollTop: this.data.menuScrollTop,
     }, () => this.updateMenuListHeight())
   },
 
   handleCategoryTap(event) {
-    this.setData({
-      activeCategory: event.currentTarget.dataset.category,
-    })
+    const nextCategory = event.currentTarget.dataset.category
+    if (!nextCategory || nextCategory === this.data.activeCategory) {
+      return
+    }
+
     this.resetMenuScrollTop()
-    this.refreshData()
+    this.refreshData(nextCategory)
   },
 
   handleQuantityChange(event) {
-    sessionStore.updateQuantity(event.detail.itemId, event.detail.value)
-    this.refreshData()
+    const { itemId, value } = event.detail
+    sessionStore.updateQuantity(itemId, value)
+    this.syncQuantityState(itemId, value)
   },
 
   handlePreview() {
@@ -116,6 +118,28 @@ Page({
 
   handleRestart() {
     navigateBackOrHome()
+  },
+
+  handleBackAttempt() {
+    if (!this.data.hasMenu) {
+      navigateBackOrHome()
+      return
+    }
+
+    wx.showModal({
+      title: '确认返回首页',
+      content: '返回首页后，本次识别的菜单和已选菜品将不会保留。是否继续返回？',
+      confirmText: '返回首页',
+      cancelText: '继续点餐',
+      success: (res) => {
+        if (!res.confirm) {
+          return
+        }
+
+        sessionStore.clearSession()
+        navigateBackOrHome()
+      },
+    })
   },
 
   updateMenuListHeight() {
@@ -152,6 +176,23 @@ Page({
     this.setData({ menuScrollTop: 1 }, () => {
       this.setData({ menuScrollTop: 0 })
     })
+  },
+
+  syncQuantityState(itemId, quantity) {
+    const summary = sessionStore.getSummary()
+    const itemIndex = this.data.items.findIndex((item) => item.id === itemId)
+    const nextData = {
+      totalCount: summary.totalCount,
+      totalPriceLabel: buildTotalPriceLabel(summary.totalPrice, sessionStore.getState().currency),
+    }
+
+    if (itemIndex === -1) {
+      this.refreshData()
+      return
+    }
+
+    nextData[`items[${itemIndex}].quantity`] = quantity
+    this.setData(nextData)
   },
 })
 
