@@ -9,3 +9,8 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 [[analytics_engine_datasets]]
 binding = "MENU_BINDING"
 dataset = "menu_translate_analytics"
+
+[observability]
+[observability.logs]
+enabled = true
+invocation_logs = true
