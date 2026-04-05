@@ -1,7 +1,10 @@
 function buildMenuRecognitionInstruction(userLanguageLabel) {
   return [
     'You are extracting a restaurant menu for a travel ordering mini program.',
-    'Read the menu image carefully and return the full menu as structured data.',
+    'Read every provided menu image carefully and return the full menu as structured data.',
+    'The images belong to the same restaurant menu and may be different pages or sections.',
+    'Merge all visible dishes into one deduplicated menu.',
+    'If the same dish appears multiple times, keep one entry with the most complete name, description, and price.',
     `Translate dish names and descriptions into ${userLanguageLabel}.`,
     `Translate category labels into ${userLanguageLabel} as well, and keep them short.`,
     'Keep the original dish name exactly as shown on the menu whenever possible.',
@@ -11,7 +14,7 @@ function buildMenuRecognitionInstruction(userLanguageLabel) {
   ].join(' ')
 }
 
-function buildMenuRecognitionMessages({ imageBase64, mimeType, userLanguageLabel }) {
+function buildMenuRecognitionMessages({ images, userLanguageLabel }) {
   return [
     {
       role: 'system',
@@ -24,30 +27,30 @@ function buildMenuRecognitionMessages({ imageBase64, mimeType, userLanguageLabel
           type: 'text',
           text: buildMenuRecognitionInstruction(userLanguageLabel),
         },
-        {
+        ...images.map((image) => ({
           type: 'image_url',
           image_url: {
-            url: `data:${mimeType};base64,${imageBase64}`,
+            url: `data:${image.mimeType};base64,${image.imageBase64}`,
           },
-        },
+        })),
       ],
     },
   ]
 }
 
-function buildMenuRecognitionInput({ imageBase64, mimeType, userLanguageLabel }) {
+function buildMenuRecognitionInput({ images, userLanguageLabel }) {
   return [
     {
       role: 'user',
       content: [
         {
-          type: 'input_image',
-          image_url: `data:${mimeType};base64,${imageBase64}`,
-        },
-        {
           type: 'input_text',
           text: buildMenuRecognitionInstruction(userLanguageLabel),
         },
+        ...images.map((image) => ({
+          type: 'input_image',
+          image_url: `data:${image.mimeType};base64,${image.imageBase64}`,
+        })),
       ],
     },
   ]

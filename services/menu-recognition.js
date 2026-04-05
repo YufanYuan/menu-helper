@@ -216,15 +216,14 @@ function getLanguageCopy(userLanguage) {
   }
 }
 
-async function recognizeMenu({ imageBase64, mimeType, userLanguage }) {
+async function recognizeMenu({ images, imageBase64, mimeType, userLanguage }) {
   if (env.useMockLLM) {
     return normalizeMenuPayload(getMockMenu(userLanguage))
   }
 
   const schema = buildMenuRecognitionSchema()
   const payload = await requestMenuExtraction({
-    imageBase64,
-    mimeType,
+    images: normalizeRecognitionImages({ images, imageBase64, mimeType }),
     userLanguage,
     schema,
   })
@@ -232,11 +231,10 @@ async function recognizeMenu({ imageBase64, mimeType, userLanguage }) {
   return normalizeMenuPayload(payload)
 }
 
-async function requestMenuExtraction({ imageBase64, mimeType, userLanguage, schema }) {
+async function requestMenuExtraction({ images, userLanguage, schema }) {
   if (env.llmProvider === 'ark') {
     const input = buildMenuRecognitionInput({
-      imageBase64,
-      mimeType,
+      images,
       userLanguageLabel: userLanguage,
     })
 
@@ -248,8 +246,7 @@ async function requestMenuExtraction({ imageBase64, mimeType, userLanguage, sche
   }
 
   const messages = buildMenuRecognitionMessages({
-    imageBase64,
-    mimeType,
+    images,
     userLanguageLabel: userLanguage,
   })
 
@@ -258,6 +255,26 @@ async function requestMenuExtraction({ imageBase64, mimeType, userLanguage, sche
     schema,
     schemaName: 'menu_extraction',
   })
+}
+
+function normalizeRecognitionImages({ images, imageBase64, mimeType }) {
+  if (Array.isArray(images) && images.length) {
+    return images
+      .filter((image) => image && image.imageBase64 && image.mimeType)
+      .map((image) => ({
+        imageBase64: image.imageBase64,
+        mimeType: image.mimeType,
+      }))
+  }
+
+  if (imageBase64 && mimeType) {
+    return [{
+      imageBase64,
+      mimeType,
+    }]
+  }
+
+  throw new Error('缺少菜单图片')
 }
 
 module.exports = {

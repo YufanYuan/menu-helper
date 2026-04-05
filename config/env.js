@@ -2,6 +2,10 @@ const env = {
   useMockLLM: false,
   llmProvider: 'openrouter',
   requestTimeout: 120000,
+  features: {
+    // 代码级开关。默认 1 表示单图；改成 2 及以上即可开启多图上传。
+    menuUploadMaxCount: 3,
+  },
   openrouter: {
     apiUrl: 'https://openrouter.ai/api/v1/chat/completions',
     apiKey: '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',

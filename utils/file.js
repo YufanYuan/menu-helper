@@ -1,23 +1,26 @@
-function chooseImage(sourceType) {
+function chooseImages(sourceType, count) {
   return new Promise((resolve, reject) => {
     wx.chooseMedia({
-      count: 1,
+      count: Math.max(1, Math.min(Number(count) || 1, 9)),
       mediaType: ['image'],
       sourceType,
       camera: 'back',
       success: (res) => {
-        const [file] = res.tempFiles || []
-        if (!file) {
+        const files = (res.tempFiles || [])
+          .filter((file) => file && file.tempFilePath)
+          .map((file) => ({
+            path: file.tempFilePath,
+            size: file.size || 0,
+            width: file.width || 0,
+            height: file.height || 0,
+          }))
+
+        if (!files.length) {
           reject(new Error('未选择图片'))
           return
         }
 
-        resolve({
-          path: file.tempFilePath,
-          size: file.size || 0,
-          width: file.width || 0,
-          height: file.height || 0,
-        })
+        resolve(files)
       },
       fail: reject,
     })
@@ -58,7 +61,7 @@ function getMimeType(path) {
 }
 
 module.exports = {
-  chooseImage,
+  chooseImages,
   compressImage,
   readFileAsBase64,
   getMimeType,

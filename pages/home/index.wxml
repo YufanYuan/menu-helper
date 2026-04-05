@@ -8,7 +8,12 @@
   </view>
 
   <view class="page-body">
-    <image-picker imagePath="{{imagePath}}" bind:selected="handleImageSelected"></image-picker>
+    <image-picker
+      imagePaths="{{imagePaths}}"
+      uploadLimit="{{uploadLimit}}"
+      bind:selected="handleImageSelected"
+      bind:cleared="handleImageCleared"
+    ></image-picker>
 
     <view class="card settings-card">
       <view>
@@ -23,7 +28,7 @@
       </picker>
     </view>
 
-    <button class="primary-button action-button {{!imagePath ? 'disabled' : ''}}" bindtap="handleRecognize">
+    <button class="primary-button action-button {{!imagePaths.length ? 'disabled' : ''}}" bindtap="handleRecognize">
       识别菜单
     </button>
   </view>
