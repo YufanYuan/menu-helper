@@ -33,6 +33,63 @@ page {
   line-height: 1.1;
 }
 
+.fx-shell {
+  margin-top: 24rpx;
+  padding: 24rpx;
+  border-radius: 28rpx;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.fx-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+}
+
+.fx-title {
+  color: #5e655f;
+  font-size: 24rpx;
+}
+
+.fx-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 12rpx;
+  padding: 12rpx 18rpx;
+  border-radius: 999rpx;
+  background: #ffffff;
+  color: #182126;
+  font-size: 24rpx;
+}
+
+.picker-arrow {
+  color: #8c938e;
+}
+
+.fx-price {
+  display: block;
+  margin-top: 16rpx;
+  color: #182126;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.fx-meta {
+  display: block;
+  margin-top: 10rpx;
+  color: #5e655f;
+  font-size: 22rpx;
+  line-height: 1.5;
+}
+
+.fx-error {
+  display: block;
+  margin-top: 10rpx;
+  color: #b6523a;
+  font-size: 22rpx;
+}
+
 .preview-list {
   margin-top: 24rpx;
   flex: 1;

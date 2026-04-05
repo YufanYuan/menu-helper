@@ -12,6 +12,7 @@ const DEFAULT_ENV = {
   },
   features: {
     menuUploadMaxCount: 1,
+    exchangeRateReferenceEnabled: false,
   },
   volcengine: {
     forced: false,

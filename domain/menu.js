@@ -1,3 +1,5 @@
+const { formatCurrencyAmount, normalizeCurrencyCode } = require('../utils/currency')
+
 const ALL_CATEGORY = '全部'
 
 function normalizeCategory(value) {
@@ -18,7 +20,7 @@ function normalizeMenuPayload(payload) {
 
   return {
     menuLanguage: normalizeText(payload && payload.menuLanguage) || '未知',
-    currency: normalizeText(payload && payload.currency) || '',
+    currency: normalizeCurrencyCode(payload && payload.currency),
     items: items
       .map((item, index) => ({
         id: normalizeText(item.id) || `item_${index + 1}`,
@@ -61,10 +63,7 @@ function formatPrice(item, currency) {
   if (!item.priceValue) {
     return '价格待确认'
   }
-  if (currency) {
-    return `${currency} ${item.priceValue.toFixed(2)}`
-  }
-  return `${item.priceValue.toFixed(2)}`
+  return formatCurrencyAmount(item.priceValue, currency)
 }
 
 module.exports = {

@@ -3,6 +3,7 @@ const STORAGE_KEY = 'menu_helper_settings'
 const defaultState = {
   userLanguage: '中文',
   orderDisplayMode: 'original',
+  preferredCurrency: '',
   clientCountry: 'INTL',
 }
 
@@ -33,6 +34,12 @@ function setOrderDisplayMode(orderDisplayMode) {
   return getState()
 }
 
+function setPreferredCurrency(preferredCurrency) {
+  state = Object.assign({}, state, { preferredCurrency })
+  persist()
+  return getState()
+}
+
 function setClientCountry(clientCountry) {
   state = Object.assign({}, state, { clientCountry })
   persist()
@@ -43,5 +50,6 @@ module.exports = {
   getState,
   setUserLanguage,
   setOrderDisplayMode,
+  setPreferredCurrency,
   setClientCountry,
 }
