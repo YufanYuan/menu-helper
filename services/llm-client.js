@@ -1,5 +1,11 @@
 const env = require('../config/env')
-const { parseStructuredPayload } = require('../utils/json')
+const settingsStore = require('../store/settings-store')
+const { parseStructuredPayload, safeJsonParse } = require('../utils/json')
+
+const DIRECT_VOLC_COUNTRIES = {
+  CN: true,
+  RU: true,
+}
 
 function loginWithWeChat() {
   return new Promise((resolve, reject) => {
@@ -19,7 +25,32 @@ function loginWithWeChat() {
   })
 }
 
+function normalizeCountry(value) {
+  if (typeof value !== 'string') {
+    return 'INTL'
+  }
+
+  const code = value.trim().toUpperCase()
+  return DIRECT_VOLC_COUNTRIES[code] ? code : 'INTL'
+}
+
+function shouldUseVolcEngine() {
+  return DIRECT_VOLC_COUNTRIES[normalizeCountry(settingsStore.getState().clientCountry)]
+}
+
 function requestStructuredChatCompletion({ messages, schema, schemaName }) {
+  if (shouldUseVolcEngine()) {
+    return requestVolcEngineStructuredChatCompletion({
+      messages,
+      schema,
+      schemaName,
+    })
+  }
+
+  return requestOpenRouterStructuredChatCompletion({ messages, schema, schemaName })
+}
+
+function requestOpenRouterStructuredChatCompletion({ messages, schema, schemaName }) {
   const config = env.cloudflare || {}
   const hasModels = Array.isArray(config.models) && config.models.length > 0
 
@@ -101,6 +132,209 @@ function requestStructuredChatCompletion({ messages, schema, schemaName }) {
         })
       }),
   )
+}
+
+function requestVolcEngineStructuredChatCompletion({ messages, schema, schemaName }) {
+  const config = env.volcengine || {}
+
+  if (!config.apiKey || !config.baseUrl || !config.model) {
+    return Promise.reject(new Error('火山引擎配置不完整，请检查 config/env.js'))
+  }
+
+  const payload = {
+    model: config.model,
+    input: toVolcInput(buildVolcMessages(messages, schema, schemaName)),
+  }
+
+  if (!payload.input.length) {
+    return Promise.reject(new Error('火山引擎请求缺少有效输入'))
+  }
+
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: `${config.baseUrl}/responses`,
+      method: 'POST',
+      timeout: env.requestTimeout,
+      header: {
+        Authorization: `Bearer ${config.apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      data: payload,
+      success: (res) => {
+        const body = normalizeResponseBody(res.data)
+
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          const message =
+            (body.error && body.error.message) ||
+            body.message ||
+            `火山引擎请求失败: ${res.statusCode}`
+          reject(new Error(message))
+          return
+        }
+
+        const content = extractVolcResponseText(body)
+
+        if (!content) {
+          reject(new Error('火山引擎返回为空'))
+          return
+        }
+
+        try {
+          resolve(parseStructuredPayload(content))
+        } catch (error) {
+          reject(error)
+        }
+      },
+      fail: () => {
+        reject(new Error('请求火山引擎失败，请检查网络、域名白名单或密钥配置'))
+      },
+    })
+  })
+}
+
+function buildVolcMessages(messages, schema, schemaName) {
+  const schemaLabel = schemaName || 'response'
+  const schemaInstruction = [
+    `Return exactly one valid JSON object for schema "${schemaLabel}".`,
+    'Do not include markdown fences or any extra explanation.',
+    `JSON Schema: ${JSON.stringify(schema)}`,
+  ].join(' ')
+
+  return [
+    {
+      role: 'system',
+      content: schemaInstruction,
+    },
+  ].concat(Array.isArray(messages) ? messages : [])
+}
+
+function toVolcInput(messages) {
+  if (!Array.isArray(messages)) {
+    return []
+  }
+
+  const mapped = []
+
+  messages.forEach((message) => {
+    if (!message || typeof message !== 'object') {
+      return
+    }
+
+    const role = typeof message.role === 'string' ? message.role : 'user'
+    const content = message.content
+
+    if (typeof content === 'string') {
+      mapped.push({
+        role,
+        content: [{ type: 'input_text', text: content }],
+      })
+      return
+    }
+
+    if (content && typeof content === 'object' && !Array.isArray(content)) {
+      mapped.push({
+        role,
+        content: [{ type: 'input_text', text: JSON.stringify(content) }],
+      })
+      return
+    }
+
+    if (!Array.isArray(content)) {
+      return
+    }
+
+    const mappedContent = []
+
+    content.forEach((item) => {
+      if (!item || typeof item !== 'object') {
+        return
+      }
+
+      if (item.type === 'text' && typeof item.text === 'string') {
+        mappedContent.push({
+          type: 'input_text',
+          text: item.text,
+        })
+        return
+      }
+
+      if (item.type !== 'image_url') {
+        return
+      }
+
+      if (typeof item.image_url === 'string') {
+        mappedContent.push({
+          type: 'input_image',
+          image_url: item.image_url,
+        })
+        return
+      }
+
+      if (item.image_url && typeof item.image_url.url === 'string') {
+        mappedContent.push({
+          type: 'input_image',
+          image_url: item.image_url.url,
+        })
+      }
+    })
+
+    if (mappedContent.length > 0) {
+      mapped.push({
+        role,
+        content: mappedContent,
+      })
+    }
+  })
+
+  return mapped
+}
+
+function normalizeResponseBody(body) {
+  if (body && typeof body === 'object') {
+    return body
+  }
+
+  if (typeof body === 'string') {
+    return safeJsonParse(body, {}) || {}
+  }
+
+  return {}
+}
+
+function extractVolcResponseText(response) {
+  if (!response || typeof response !== 'object') {
+    return ''
+  }
+
+  if (typeof response.output_text === 'string' && response.output_text.trim()) {
+    return response.output_text.trim()
+  }
+
+  if (Array.isArray(response.output)) {
+    const text = response.output
+      .map((item) => {
+        if (!item || !Array.isArray(item.content)) {
+          return ''
+        }
+
+        return item.content
+          .map((contentItem) => {
+            if (contentItem && contentItem.type === 'output_text' && typeof contentItem.text === 'string') {
+              return contentItem.text
+            }
+            return ''
+          })
+          .join('')
+      })
+      .join('')
+      .trim()
+
+    if (text) {
+      return text
+    }
+  }
+
+  return extractChatCompletionText(response)
 }
 
 function extractChatCompletionText(response) {

@@ -6,6 +6,7 @@
 - 基于 `wechat_code` 调用微信 `code2Session` 获取用户 `openid`
 - 转发 OpenRouter chat completions（当前仅支持 `stream: false`）
 - 将 usage/cost/地区/状态/时延写入 Cloudflare Analytics Engine
+- 该接口当前仅服务国际流量；中国大陆/俄罗斯用户由小程序端直接请求火山引擎豆包模型
 
 ## 目录结构
 

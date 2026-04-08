@@ -3,6 +3,7 @@ const STORAGE_KEY = 'menu_helper_settings'
 const defaultState = {
   userLanguage: '中文',
   orderDisplayMode: 'original',
+  clientCountry: 'INTL',
 }
 
 let state = hydrate()
@@ -32,8 +33,15 @@ function setOrderDisplayMode(orderDisplayMode) {
   return getState()
 }
 
+function setClientCountry(clientCountry) {
+  state = Object.assign({}, state, { clientCountry })
+  persist()
+  return getState()
+}
+
 module.exports = {
   getState,
   setUserLanguage,
   setOrderDisplayMode,
+  setClientCountry,
 }

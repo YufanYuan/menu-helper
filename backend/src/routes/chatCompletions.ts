@@ -143,9 +143,8 @@ export async function handleChatCompletions(request: Request, env: Env): Promise
   }
 
   try {
-    const baseUrl = env.OPENROUTER_BASE_URL ?? 'https://openrouter.ai/api/v1';
     const { payload: upstreamPayload, usage } = await callOpenRouter({
-      baseUrl,
+      baseUrl: env.OPENROUTER_BASE_URL ?? 'https://openrouter.ai/api/v1',
       apiKey: env.OPENROUTER_API_KEY,
       body: upstreamBody,
       requestId,
