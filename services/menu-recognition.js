@@ -7,6 +7,7 @@ const {
   buildMenuRecognitionSchema,
 } = require('../utils/prompts')
 const { normalizeMenuPayload } = require('../domain/menu')
+const { readFileAsBase64 } = require('../utils/file')
 
 function getMockMenu(userLanguage) {
   const copy = getLanguageCopy(userLanguage)
@@ -17,7 +18,7 @@ function getMockMenu(userLanguage) {
     items: [
       {
         id: 'dish_1',
-        category: copy.categories.main,
+        translatedCategory: copy.categories.main,
         originalName: 'Pates aux fruits de mer',
         translatedName: copy.seafoodPasta,
         descriptionOriginal: 'Crevettes, moules, sauce tomate epicee',
@@ -28,7 +29,7 @@ function getMockMenu(userLanguage) {
       },
       {
         id: 'dish_2',
-        category: copy.categories.starter,
+        translatedCategory: copy.categories.starter,
         originalName: 'Veloute de potiron',
         translatedName: copy.pumpkinSoup,
         descriptionOriginal: 'Soupe cremeuse a la courge',
@@ -39,7 +40,7 @@ function getMockMenu(userLanguage) {
       },
       {
         id: 'dish_3',
-        category: copy.categories.dessert,
+        translatedCategory: copy.categories.dessert,
         originalName: 'Creme brulee',
         translatedName: copy.cremeBrulee,
         descriptionOriginal: 'Vanille, caramel croustillant',
@@ -49,7 +50,7 @@ function getMockMenu(userLanguage) {
       },
       {
         id: 'dish_4',
-        category: copy.categories.main,
+        translatedCategory: copy.categories.main,
         originalName: 'Boeuf bourguignon',
         translatedName: copy.beefStew,
         descriptionOriginal: 'Boeuf mijote au vin rouge, carottes',
@@ -59,7 +60,7 @@ function getMockMenu(userLanguage) {
       },
       {
         id: 'dish_5',
-        category: copy.categories.main,
+        translatedCategory: copy.categories.main,
         originalName: 'Poulet roti citron',
         translatedName: copy.lemonChicken,
         descriptionOriginal: 'Poulet roti, jus de citron, herbes',
@@ -69,7 +70,7 @@ function getMockMenu(userLanguage) {
       },
       {
         id: 'dish_6',
-        category: copy.categories.starter,
+        translatedCategory: copy.categories.starter,
         originalName: 'Salade de chevre chaud',
         translatedName: copy.goatCheeseSalad,
         descriptionOriginal: 'Salade verte, fromage de chevre, noix',
@@ -79,7 +80,7 @@ function getMockMenu(userLanguage) {
       },
       {
         id: 'dish_7',
-        category: copy.categories.starter,
+        translatedCategory: copy.categories.starter,
         originalName: 'Soupe a l oignon',
         translatedName: copy.onionSoup,
         descriptionOriginal: 'Soupe d oignons gratinee au fromage',
@@ -89,7 +90,7 @@ function getMockMenu(userLanguage) {
       },
       {
         id: 'dish_8',
-        category: copy.categories.dessert,
+        translatedCategory: copy.categories.dessert,
         originalName: 'Tarte au citron',
         translatedName: copy.lemonTart,
         descriptionOriginal: 'Creme citron, pate sablee',
@@ -100,7 +101,7 @@ function getMockMenu(userLanguage) {
       },
       {
         id: 'dish_9',
-        category: copy.categories.drinks,
+        translatedCategory: copy.categories.drinks,
         originalName: 'Citronnade maison',
         translatedName: copy.lemonade,
         descriptionOriginal: 'Boisson citronnee maison',
@@ -110,7 +111,7 @@ function getMockMenu(userLanguage) {
       },
       {
         id: 'dish_10',
-        category: copy.categories.drinks,
+        translatedCategory: copy.categories.drinks,
         originalName: 'Cafe allonge',
         translatedName: copy.coffee,
         descriptionOriginal: 'Cafe legerement allonge',
@@ -120,7 +121,7 @@ function getMockMenu(userLanguage) {
       },
       {
         id: 'dish_11',
-        category: copy.categories.special,
+        translatedCategory: copy.categories.special,
         originalName: 'Plateau degustation',
         translatedName: copy.tastingPlate,
         descriptionOriginal: 'Selection de trois specialites de la maison',
@@ -130,7 +131,7 @@ function getMockMenu(userLanguage) {
       },
       {
         id: 'dish_12',
-        category: copy.categories.special,
+        translatedCategory: copy.categories.special,
         originalName: 'Menu enfant',
         translatedName: copy.kidsMenu,
         descriptionOriginal: 'Petit plat, boisson, dessert',
@@ -214,14 +215,14 @@ function getLanguageCopy(userLanguage) {
   }
 }
 
-async function recognizeMenu({ imageBase64, mimeType, userLanguage }) {
+async function recognizeMenu({ imagePath, mimeType, userLanguage }) {
   if (env.useMockLLM) {
     return normalizeMenuPayload(getMockMenu(userLanguage))
   }
 
   const schema = buildMenuRecognitionSchema()
   const payload = await requestMenuExtraction({
-    imageBase64,
+    imagePath,
     mimeType,
     userLanguage,
     schema,
@@ -230,7 +231,8 @@ async function recognizeMenu({ imageBase64, mimeType, userLanguage }) {
   return normalizeMenuPayload(payload)
 }
 
-async function requestMenuExtraction({ imageBase64, mimeType, userLanguage, schema }) {
+async function requestMenuExtraction({ imagePath, mimeType, userLanguage, schema }) {
+  const imageBase64 = await readFileAsBase64(imagePath)
   const messages = buildMenuRecognitionMessages({
     imageBase64,
     mimeType,

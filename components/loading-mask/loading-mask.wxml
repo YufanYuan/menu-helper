@@ -1,7 +1,13 @@
 <view wx:if="{{visible}}" class="mask">
   <view class="mask-card">
-    <view class="spinner"></view>
     <text class="mask-title">{{title}}</text>
     <text wx:if="{{subtitle}}" class="mask-subtitle">{{subtitle}}</text>
+    <view class="progress-meta">
+      <text class="progress-label">识别进度</text>
+      <text class="progress-value">{{progressText}}</text>
+    </view>
+    <view class="progress-track">
+      <view class="progress-fill" style="width: {{progressPercent}}%;"></view>
+    </view>
   </view>
 </view>

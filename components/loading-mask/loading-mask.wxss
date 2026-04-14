@@ -15,27 +15,18 @@
 
 .mask-card {
   width: 100%;
-  max-width: 560rpx;
-  padding: 42rpx 38rpx;
+  max-width: 640rpx;
+  padding: 42rpx 42rpx;
   border-radius: 32rpx;
   background: #fffaf0;
-  text-align: center;
-}
-
-.spinner {
-  width: 80rpx;
-  height: 80rpx;
-  margin: 0 auto 24rpx;
-  border: 8rpx solid rgba(24, 33, 38, 0.12);
-  border-top-color: #182126;
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
+  box-sizing: border-box;
 }
 
 .mask-title {
   display: block;
   font-size: 30rpx;
   font-weight: 600;
+  text-align: left;
 }
 
 .mask-subtitle {
@@ -44,14 +35,48 @@
   color: #5e655f;
   font-size: 24rpx;
   line-height: 1.5;
+  text-align: left;
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
+.progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 30rpx;
+  font-size: 22rpx;
+  color: #6a7068;
+}
 
-  to {
-    transform: rotate(360deg);
-  }
+.progress-label {
+  letter-spacing: 1rpx;
+}
+
+.progress-value {
+  color: #182126;
+  font-weight: 600;
+}
+
+.progress-track {
+  position: relative;
+  width: 100%;
+  height: 18rpx;
+  margin-top: 16rpx;
+  overflow: hidden;
+  border-radius: 999rpx;
+  background: rgba(24, 33, 38, 0.08);
+}
+
+.progress-fill {
+  position: relative;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #182126 0%, #5e7b6d 100%);
+  transition: width 200ms linear;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.28) 50%, rgba(255, 255, 255, 0) 100%);
 }

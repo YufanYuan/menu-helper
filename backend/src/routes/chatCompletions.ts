@@ -1,5 +1,6 @@
 import type { ChatCompletionRequest } from '../types/api';
 import type { Env } from '../types/env';
+import type { RuntimeContext } from '../types/runtime';
 import { resolveWeChatOpenId } from '../services/wechat';
 import { callOpenRouter } from '../services/openrouter';
 import { writeUsageEvent } from '../services/analytics';
@@ -78,7 +79,11 @@ function getRequestedModelLabel(body: ChatCompletionRequest): string {
   return 'unknown';
 }
 
-export async function handleChatCompletions(request: Request, env: Env): Promise<Response> {
+export async function handleChatCompletions(
+  request: Request,
+  env: Env,
+  runtimeContext: RuntimeContext,
+): Promise<Response> {
   const requestId = crypto.randomUUID();
   const startedAt = Date.now();
 
@@ -154,7 +159,7 @@ export async function handleChatCompletions(request: Request, env: Env): Promise
     const createdAt = new Date().toISOString();
 
     try {
-      writeUsageEvent(env.USAGE_DATASET, {
+      writeUsageEvent(runtimeContext.analyticsWriter, {
         eventType: 'chat_completion',
         openid,
         model: upstreamPayload.model ?? requestedModelLabel,
@@ -162,7 +167,7 @@ export async function handleChatCompletions(request: Request, env: Env): Promise
         statusCode: 200,
         latencyMs,
         usage,
-        cf: request.cf,
+        location: runtimeContext.requestLocation,
         createdAt,
         requestId,
       });
@@ -188,7 +193,7 @@ export async function handleChatCompletions(request: Request, env: Env): Promise
     const createdAt = new Date().toISOString();
 
     try {
-      writeUsageEvent(env.USAGE_DATASET, {
+      writeUsageEvent(runtimeContext.analyticsWriter, {
         eventType: 'chat_completion',
         openid,
         model: requestedModelLabel,
@@ -202,7 +207,7 @@ export async function handleChatCompletions(request: Request, env: Env): Promise
           total_tokens: 0,
           cost_usd_estimate: 0,
         },
-        cf: request.cf,
+        location: runtimeContext.requestLocation,
         createdAt,
         requestId,
       });

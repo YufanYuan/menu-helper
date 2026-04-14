@@ -1,11 +1,6 @@
 <navigation-bar title="菜单助手" back="{{false}}" color="#182126" background="transparent"></navigation-bar>
 
 <view class="page-shell">
-  <view class="hero">
-    <view class="hero-copy">
-      <text class="hero-title">拍下菜单，轻松看懂并完成点餐</text>
-    </view>
-  </view>
 
   <view class="page-body">
     <image-picker imagePath="{{imagePath}}" bind:selected="handleImageSelected"></image-picker>
@@ -29,4 +24,4 @@
   </view>
 </view>
 
-<loading-mask visible="{{isAnalyzing}}" title="{{loadingTitle}}" subtitle="{{loadingSubtitle}}"></loading-mask>
+<loading-mask visible="{{isAnalyzing}}" title="{{loadingTitle}}" subtitle="{{loadingSubtitle}}" estimateSeconds="{{60}}" targetProgress="{{0.8}}"></loading-mask>

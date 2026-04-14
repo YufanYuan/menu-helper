@@ -37,7 +37,7 @@
 
 .cart-action {
   flex: none;
-  min-width: 188rpx;
+  min-width: 120rpx;
   min-height: 76rpx;
   padding: 0 30rpx;
   border-radius: 999rpx;
@@ -45,7 +45,7 @@
   color: #182126;
   font-size: 26rpx;
   font-weight: 600;
-  flex-shrink: 0;
+  flex-shrink: 1;
 }
 
 .cart-bar.disabled .cart-action {

@@ -34,16 +34,34 @@ function normalizeCountry(value) {
   return DIRECT_VOLC_COUNTRIES[code] ? code : 'INTL'
 }
 
+function getForcedProvider() {
+  const cloudflareForced = Boolean(env.cloudflare && env.cloudflare.forced)
+  const volcengineForced = Boolean(env.volcengine && env.volcengine.forced)
+
+  if (cloudflareForced === volcengineForced) {
+    return ''
+  }
+
+  return volcengineForced ? 'volcengine' : 'cloudflare'
+}
+
 function shouldUseVolcEngine() {
+  const forcedProvider = getForcedProvider()
+
+  if (forcedProvider) {
+    return forcedProvider === 'volcengine'
+  }
+
   return DIRECT_VOLC_COUNTRIES[normalizeCountry(settingsStore.getState().clientCountry)]
 }
 
-function requestStructuredChatCompletion({ messages, schema, schemaName }) {
+function requestStructuredChatCompletion({ messages, schema, schemaName, volcInput }) {
   if (shouldUseVolcEngine()) {
     return requestVolcEngineStructuredChatCompletion({
       messages,
       schema,
       schemaName,
+      input: volcInput,
     })
   }
 
@@ -134,16 +152,23 @@ function requestOpenRouterStructuredChatCompletion({ messages, schema, schemaNam
   )
 }
 
-function requestVolcEngineStructuredChatCompletion({ messages, schema, schemaName }) {
+function requestVolcEngineStructuredChatCompletion({ messages, schema, schemaName, input }) {
   const config = env.volcengine || {}
 
   if (!config.apiKey || !config.baseUrl || !config.model) {
     return Promise.reject(new Error('火山引擎配置不完整，请检查 config/env.js'))
   }
 
+  const normalizedInput = Array.isArray(input) && input.length ? input : toVolcInput(buildVolcMessages(messages))
   const payload = {
     model: config.model,
-    input: toVolcInput(buildVolcMessages(messages, schema, schemaName)),
+    input: normalizedInput,
+    thinking: {
+      type: 'disabled',
+    },
+    text: {
+      format: buildJsonSchemaFormat(schema, schemaName),
+    },
   }
 
   if (!payload.input.length) {
@@ -192,20 +217,17 @@ function requestVolcEngineStructuredChatCompletion({ messages, schema, schemaNam
   })
 }
 
-function buildVolcMessages(messages, schema, schemaName) {
-  const schemaLabel = schemaName || 'response'
-  const schemaInstruction = [
-    `Return exactly one valid JSON object for schema "${schemaLabel}".`,
-    'Do not include markdown fences or any extra explanation.',
-    `JSON Schema: ${JSON.stringify(schema)}`,
-  ].join(' ')
+function buildVolcMessages(messages) {
+  return Array.isArray(messages) ? messages : []
+}
 
-  return [
-    {
-      role: 'system',
-      content: schemaInstruction,
-    },
-  ].concat(Array.isArray(messages) ? messages : [])
+function buildJsonSchemaFormat(schema, schemaName) {
+  return {
+    type: 'json_schema',
+    name: schemaName || 'response',
+    schema,
+    strict: true,
+  }
 }
 
 function toVolcInput(messages) {

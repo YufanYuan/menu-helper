@@ -1,6 +1,7 @@
 const sessionStore = require('../../store/session-store')
 const settingsStore = require('../../store/settings-store')
 const { ALL_CATEGORY, buildCategories, filterItemsByCategory, formatPrice } = require('../../domain/menu')
+const { hideShareMenu } = require('../../utils/share')
 
 const LANGUAGE_LABELS = {
   ar: 'العربية',
@@ -41,6 +42,8 @@ Page({
   },
 
   onShow() {
+    hideShareMenu()
+
     const session = sessionStore.getState()
     if (!session.items.length) {
       this.setData({

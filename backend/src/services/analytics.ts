@@ -1,5 +1,21 @@
 import type { OpenRouterUsage } from './openrouter';
 
+export interface RequestLocation {
+  country?: string;
+  city?: string;
+  region?: string;
+  timezone?: string;
+  colo?: string;
+}
+
+export interface AnalyticsEngineDatasetBinding {
+  writeDataPoint(dataPoint: {
+    blobs: string[];
+    doubles: number[];
+    indexes: string[];
+  }): void;
+}
+
 export interface AnalyticsEventInput {
   eventType: string;
   openid: string;
@@ -8,21 +24,28 @@ export interface AnalyticsEventInput {
   statusCode: number;
   latencyMs: number;
   usage: OpenRouterUsage;
-  cf: Request['cf'] | undefined;
+  location?: RequestLocation;
   createdAt: string;
   requestId: string;
+}
+
+export interface AnalyticsWriter {
+  writeUsageEvent(event: AnalyticsEventInput): void;
 }
 
 function toBlobValue(value: unknown): string {
   return typeof value === 'string' && value.trim().length > 0 ? value : 'unknown';
 }
 
-export function writeUsageEvent(dataset: AnalyticsEngineDataset, event: AnalyticsEventInput): void {
-  const country = toBlobValue(event.cf?.country);
-  const city = toBlobValue(event.cf?.city);
-  const region = toBlobValue(event.cf?.region);
-  const timezone = toBlobValue(event.cf?.timezone);
-  const colo = toBlobValue(event.cf?.colo);
+function writeCloudflareUsageEvent(
+  dataset: AnalyticsEngineDatasetBinding,
+  event: AnalyticsEventInput,
+): void {
+  const country = toBlobValue(event.location?.country);
+  const city = toBlobValue(event.location?.city);
+  const region = toBlobValue(event.location?.region);
+  const timezone = toBlobValue(event.location?.timezone);
+  const colo = toBlobValue(event.location?.colo);
 
   dataset.writeDataPoint({
     blobs: [
@@ -49,4 +72,22 @@ export function writeUsageEvent(dataset: AnalyticsEngineDataset, event: Analytic
     ],
     indexes: [event.requestId],
   });
+}
+
+export function createCloudflareAnalyticsWriter(
+  dataset?: AnalyticsEngineDatasetBinding,
+): AnalyticsWriter | undefined {
+  if (!dataset) {
+    return undefined;
+  }
+
+  return {
+    writeUsageEvent(event) {
+      writeCloudflareUsageEvent(dataset, event);
+    },
+  };
+}
+
+export function writeUsageEvent(writer: AnalyticsWriter | undefined, event: AnalyticsEventInput): void {
+  writer?.writeUsageEvent(event);
 }

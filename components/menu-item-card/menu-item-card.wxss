@@ -15,14 +15,14 @@
   min-width: 0;
 }
 
-.menu-original {
+.menu-primary-name {
   display: block;
   font-size: 30rpx;
   font-weight: 600;
   line-height: 1.4;
 }
 
-.menu-translated {
+.menu-secondary-name {
   display: block;
   margin-top: 10rpx;
   color: #9d5a36;

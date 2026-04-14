@@ -65,11 +65,13 @@ page {
   word-break: break-word;
 }
 
-.preview-translated {
+.preview-original {
   display: block;
   margin-top: 8rpx;
   color: #9d5a36;
   font-size: 24rpx;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 .preview-price {

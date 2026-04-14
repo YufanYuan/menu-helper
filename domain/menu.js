@@ -22,7 +22,9 @@ function normalizeMenuPayload(payload) {
     items: items
       .map((item, index) => ({
         id: normalizeText(item.id) || `item_${index + 1}`,
-        category: normalizeCategory(normalizeText(item.category)),
+        translatedCategory: normalizeCategory(
+          normalizeText(item.translatedCategory) || normalizeText(item.category),
+        ),
         originalName: normalizeText(item.originalName) || `菜品 ${index + 1}`,
         translatedName: normalizeText(item.translatedName),
         descriptionOriginal: normalizeText(item.descriptionOriginal),
@@ -38,8 +40,8 @@ function normalizeMenuPayload(payload) {
 function buildCategories(items) {
   const categories = [ALL_CATEGORY]
   items.forEach((item) => {
-    if (!categories.includes(item.category)) {
-      categories.push(item.category)
+    if (!categories.includes(item.translatedCategory)) {
+      categories.push(item.translatedCategory)
     }
   })
   return categories
@@ -49,7 +51,7 @@ function filterItemsByCategory(items, category) {
   if (!category || category === ALL_CATEGORY) {
     return items
   }
-  return items.filter((item) => item.category === category)
+  return items.filter((item) => item.translatedCategory === category)
 }
 
 function formatPrice(item, currency) {

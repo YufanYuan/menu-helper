@@ -1,5 +1,6 @@
 const sessionStore = require('../../store/session-store')
 const settingsStore = require('../../store/settings-store')
+const { hideShareMenu } = require('../../utils/share')
 
 const switchOptions = [
   { label: '当地语言', value: 'original' },
@@ -15,6 +16,7 @@ Page({
   },
 
   onShow() {
+    hideShareMenu()
     this.refreshData()
   },
 

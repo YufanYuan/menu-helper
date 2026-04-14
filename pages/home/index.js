@@ -1,7 +1,8 @@
 const sessionStore = require('../../store/session-store')
 const settingsStore = require('../../store/settings-store')
-const { compressImage, readFileAsBase64, getMimeType } = require('../../utils/file')
+const { compressImage, getMimeType } = require('../../utils/file')
 const { recognizeMenu } = require('../../services/menu-recognition')
+const { buildHomeShareContent, showHomeShareMenu } = require('../../utils/share')
 
 const languageOptions = ['中文', 'English', '日本語', '한국어']
 
@@ -15,19 +16,33 @@ Page({
     loadingSubtitle: '通常需要约 1 分钟，请稍候',
   },
 
-  onShow() {
-    const settings = settingsStore.getState()
-    const selectedLanguageIndex = Math.max(languageOptions.indexOf(settings.userLanguage), 0)
+  onLoad() {
+    const session = sessionStore.getState()
+    if (session.recognitionStatus !== 'ready') {
+      sessionStore.clearSession()
+    }
 
-    this.setData({
-      selectedLanguageIndex,
-      imagePath: '',
-    })
+    this.syncSettings()
+  },
+
+  onShow() {
+    this.syncSettings()
+    showHomeShareMenu()
+  },
+
+  onShareAppMessage() {
+    return buildHomeShareContent()
+  },
+
+  onShareTimeline() {
+    return buildHomeShareContent()
   },
 
   handleImageSelected(event) {
+    const imagePath = event.detail.path || ''
+
     this.setData({
-      imagePath: event.detail.path,
+      imagePath,
     })
   },
 
@@ -58,7 +73,6 @@ Page({
 
     try {
       const compressedPath = await compressImage(this.data.imagePath)
-      const imageBase64 = await readFileAsBase64(compressedPath)
       const mimeType = getMimeType(compressedPath)
 
       settingsStore.setUserLanguage(userLanguage)
@@ -69,7 +83,7 @@ Page({
       sessionStore.setRecognitionStatus('loading')
 
       const menuResult = await recognizeMenu({
-        imageBase64,
+        imagePath: compressedPath,
         mimeType,
         userLanguage,
       })
@@ -90,5 +104,14 @@ Page({
         isAnalyzing: false,
       })
     }
+  },
+
+  syncSettings() {
+    const settings = settingsStore.getState()
+    const selectedLanguageIndex = Math.max(languageOptions.indexOf(settings.userLanguage), 0)
+
+    this.setData({
+      selectedLanguageIndex,
+    })
   },
 })

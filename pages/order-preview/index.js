@@ -1,5 +1,6 @@
 const sessionStore = require('../../store/session-store')
 const { formatPrice } = require('../../domain/menu')
+const { hideShareMenu } = require('../../utils/share')
 
 Page({
   data: {
@@ -10,6 +11,7 @@ Page({
   },
 
   onShow() {
+    hideShareMenu()
     this.refreshData()
   },
 

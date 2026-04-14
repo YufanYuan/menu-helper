@@ -13,8 +13,8 @@
         <block wx:for="{{items}}" wx:key="id">
           <view class="card preview-item">
             <view class="preview-copy">
-              <text class="preview-name">{{item.originalName}}</text>
-              <text wx:if="{{item.translatedName}}" class="preview-translated">{{item.translatedName}}</text>
+              <text class="preview-name">{{item.translatedName || item.originalName}}</text>
+              <text wx:if="{{item.translatedName}}" class="preview-original">{{item.originalName}}</text>
               <text class="preview-price">{{item.priceLabel}} · 小计 {{item.subtotalLabel}}</text>
             </view>
             <quantity-stepper
