@@ -7,7 +7,7 @@ workers_dev = true
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 [[analytics_engine_datasets]]
-binding = "MENU_BINDING"
+binding = "USAGE_DATASET"
 dataset = "menu_translate_analytics"
 
 [observability]

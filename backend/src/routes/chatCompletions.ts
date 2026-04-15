@@ -5,6 +5,23 @@ import { resolveWeChatOpenId } from '../services/wechat';
 import { callOpenRouter } from '../services/openrouter';
 import { writeUsageEvent } from '../services/analytics';
 
+function serializeError(error: unknown): Record<string, unknown> {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+      cause: error.cause,
+    };
+  }
+
+  if (typeof error === 'object' && error !== null) {
+    return { ...(error as Record<string, unknown>) };
+  }
+
+  return { value: error };
+}
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -174,7 +191,7 @@ export async function handleChatCompletions(
     } catch (analyticsError) {
       console.error('ANALYTICS_WRITE_FAILED', {
         requestId,
-        error: analyticsError,
+        error: serializeError(analyticsError),
       });
     }
 
@@ -214,7 +231,7 @@ export async function handleChatCompletions(
     } catch (analyticsError) {
       console.error('ANALYTICS_WRITE_FAILED', {
         requestId,
-        error: analyticsError,
+        error: serializeError(analyticsError),
       });
     }
 
