@@ -7,11 +7,24 @@
   border-radius: 24rpx;
   overflow: hidden;
   background: #e8ded0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.preview-shell.multi {
+  padding: 8rpx;
 }
 
 .preview-image {
   width: 100%;
   height: 100%;
+}
+
+.preview-image.multi {
+  width: calc(50% - 4rpx);
+  height: calc(50% - 4rpx);
+  border-radius: 18rpx;
 }
 
 .placeholder-shell {
@@ -37,6 +50,25 @@
   margin-top: 14rpx;
   color: #5e655f;
   font-size: 24rpx;
+}
+
+.picker-meta {
+  margin-top: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.picker-count {
+  color: #5e655f;
+  font-size: 24rpx;
+}
+
+.picker-clear {
+  color: #182126;
+  font-size: 24rpx;
+  font-weight: 600;
 }
 
 .picker-actions {

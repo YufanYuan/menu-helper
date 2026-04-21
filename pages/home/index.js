@@ -1,14 +1,17 @@
 const sessionStore = require('../../store/session-store')
 const settingsStore = require('../../store/settings-store')
-const { compressImage, getMimeType } = require('../../utils/file')
+const { compressImage, getMimeType, readFileAsBase64 } = require('../../utils/file')
 const { recognizeMenu } = require('../../services/menu-recognition')
+const { getMenuImageUploadLimit } = require('../../config/features')
+const { mergeImagePaths } = require('../../utils/image-selection')
 const { buildHomeShareContent, showHomeShareMenu } = require('../../utils/share')
 
 const languageOptions = ['中文', 'English', '日本語', '한국어']
 
 Page({
   data: {
-    imagePath: '',
+    imagePaths: [],
+    uploadLimit: getMenuImageUploadLimit(),
     selectedLanguageIndex: 0,
     languageOptions,
     isAnalyzing: false,
@@ -39,10 +42,22 @@ Page({
   },
 
   handleImageSelected(event) {
-    const imagePath = event.detail.path || ''
+    const files = event.detail.files || []
+    const incomingPaths = files.map((file) => file.path).filter(Boolean)
 
     this.setData({
-      imagePath,
+      imagePaths: mergeImagePaths(
+        this.data.imagePaths,
+        incomingPaths,
+        this.data.uploadLimit,
+        event.detail.mergeMode
+      ),
+    })
+  },
+
+  handleImageCleared() {
+    this.setData({
+      imagePaths: [],
     })
   },
 
@@ -53,8 +68,8 @@ Page({
   },
 
   async handleRecognize() {
-    if (!this.data.imagePath || this.data.isAnalyzing) {
-      if (!this.data.imagePath) {
+    if (!this.data.imagePaths.length || this.data.isAnalyzing) {
+      if (!this.data.imagePaths.length) {
         wx.showToast({
           title: '请先选择菜单图片',
           icon: 'none',
@@ -72,19 +87,20 @@ Page({
     })
 
     try {
-      const compressedPath = await compressImage(this.data.imagePath)
-      const mimeType = getMimeType(compressedPath)
+      const recognitionImages = await this.prepareRecognitionImages(this.data.imagePaths)
 
       settingsStore.setUserLanguage(userLanguage)
-      sessionStore.setDraftImage({
-        imagePath: compressedPath,
-        mimeType,
-      })
+      sessionStore.setDraftImages(recognitionImages.map((image) => ({
+        imagePath: image.path,
+        mimeType: image.mimeType,
+      })))
       sessionStore.setRecognitionStatus('loading')
 
       const menuResult = await recognizeMenu({
-        imagePath: compressedPath,
-        mimeType,
+        images: recognitionImages.map((image) => ({
+          imageBase64: image.imageBase64,
+          mimeType: image.mimeType,
+        })),
         userLanguage,
       })
 
@@ -112,6 +128,24 @@ Page({
 
     this.setData({
       selectedLanguageIndex,
+      uploadLimit: getMenuImageUploadLimit(),
     })
+  },
+
+  async prepareRecognitionImages(imagePaths) {
+    const images = []
+
+    for (const imagePath of imagePaths) {
+      const compressedPath = await compressImage(imagePath)
+      const imageBase64 = await readFileAsBase64(compressedPath)
+
+      images.push({
+        path: compressedPath,
+        mimeType: getMimeType(compressedPath),
+        imageBase64,
+      })
+    }
+
+    return images
   },
 })

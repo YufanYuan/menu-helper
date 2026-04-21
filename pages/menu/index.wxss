@@ -35,6 +35,13 @@ page {
   flex: 1;
 }
 
+.summary-subtitle-extra {
+  display: block;
+  margin-top: 12rpx;
+  color: #5e655f;
+  font-size: 24rpx;
+}
+
 .summary-image {
   flex: none;
   width: 148rpx;

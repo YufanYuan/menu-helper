@@ -1,6 +1,8 @@
 <view class="picker-shell card">
-  <view wx:if="{{imagePath}}" class="preview-shell">
-    <image class="preview-image" src="{{imagePath}}" mode="aspectFill"></image>
+  <view wx:if="{{imagePaths.length}}" class="preview-shell {{imagePaths.length > 1 ? 'multi' : ''}}">
+    <block wx:for="{{imagePaths}}" wx:key="*this">
+      <image class="preview-image {{imagePaths.length > 1 ? 'multi' : ''}}" src="{{item}}" mode="aspectFill"></image>
+    </block>
   </view>
   <view wx:else class="placeholder-shell">
     <text class="placeholder-title">上传菜单照片</text>
@@ -8,8 +10,13 @@
     <text class="placeholder-subtitle">目前仅支持单张识别</text>
   </view>
 
+  <view wx:if="{{imagePaths.length}}" class="picker-meta">
+    <text class="picker-count">已选择 {{imagePaths.length}} / {{uploadLimit}} 张</text>
+    <text class="picker-clear" bindtap="handleClear">清空重选</text>
+  </view>
+
   <view class="picker-actions">
-    <button class="picker-button strong" bindtap="chooseFromCamera">拍照识别</button>
-    <button class="picker-button" bindtap="chooseFromAlbum">相册导入</button>
+    <button class="picker-button strong" bindtap="chooseFromCamera">{{imagePaths.length ? '继续拍照' : '拍照识别'}}</button>
+    <button class="picker-button" bindtap="chooseFromAlbum">{{imagePaths.length ? '继续添加' : '相册导入'}}</button>
   </view>
 </view>

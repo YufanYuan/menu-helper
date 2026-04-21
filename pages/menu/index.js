@@ -24,6 +24,8 @@ const LANGUAGE_LABELS = {
 Page({
   data: {
     imagePath: '',
+    imagePaths: [],
+    imageCount: 0,
     menuLanguage: '',
     menuLanguageLabel: '未知',
     userLanguage: '',
@@ -48,6 +50,9 @@ Page({
     if (!session.items.length) {
       this.setData({
         hasMenu: false,
+        imagePath: '',
+        imagePaths: [],
+        imageCount: 0,
         categories: [ALL_CATEGORY],
         activeCategory: ALL_CATEGORY,
         items: [],
@@ -86,6 +91,9 @@ Page({
       items,
       totalCount: summary.totalCount,
       totalPriceLabel: buildTotalPriceLabel(summary.totalPrice, session.currency),
+      menuScrollTop: this.data.menuScrollTop,
+      imagePaths: session.imagePaths,
+      imageCount: session.imagePaths.length,
     }, () => this.updateMenuListHeight())
   },
 

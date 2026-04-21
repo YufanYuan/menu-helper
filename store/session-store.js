@@ -5,7 +5,9 @@ const STORAGE_KEY = 'menu_helper_session'
 const defaultState = {
   sessionId: '',
   imagePath: '',
+  imagePaths: [],
   mimeType: '',
+  images: [],
   menuLanguage: '',
   currency: '',
   items: [],
@@ -28,15 +30,27 @@ function persist() {
 function getState() {
   return {
     ...state,
+    imagePaths: state.imagePaths.slice(),
+    images: state.images.map((image) => Object.assign({}, image)),
     items: state.items.slice(),
     cart: Object.assign({}, state.cart),
   }
 }
 
-function setDraftImage({ imagePath, mimeType }) {
+function setDraftImages(images) {
+  const draftImages = (images || [])
+    .filter((image) => image && image.imagePath)
+    .map((image) => ({
+      imagePath: image.imagePath,
+      mimeType: image.mimeType || '',
+    }))
+  const [firstImage] = draftImages
+
   state = Object.assign({}, defaultState, {
-    imagePath,
-    mimeType,
+    imagePath: firstImage ? firstImage.imagePath : '',
+    imagePaths: draftImages.map((image) => image.imagePath),
+    mimeType: firstImage ? firstImage.mimeType : '',
+    images: draftImages,
     recognitionStatus: 'draft',
     sessionId: `session_${Date.now()}`,
   })
@@ -90,7 +104,7 @@ function getSummary() {
 
 module.exports = {
   getState,
-  setDraftImage,
+  setDraftImages,
   setRecognitionStatus,
   setMenuResult,
   updateQuantity,

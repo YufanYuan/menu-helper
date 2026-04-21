@@ -3,11 +3,11 @@ const {
   requestStructuredChatCompletion,
 } = require('./llm-client')
 const {
+  buildMenuRecognitionInput,
   buildMenuRecognitionMessages,
   buildMenuRecognitionSchema,
 } = require('../utils/prompts')
 const { normalizeMenuPayload } = require('../domain/menu')
-const { readFileAsBase64 } = require('../utils/file')
 
 function getMockMenu(userLanguage) {
   const copy = getLanguageCopy(userLanguage)
@@ -215,15 +215,14 @@ function getLanguageCopy(userLanguage) {
   }
 }
 
-async function recognizeMenu({ imagePath, mimeType, userLanguage }) {
+async function recognizeMenu({ images, imageBase64, mimeType, userLanguage }) {
   if (env.useMockLLM) {
     return normalizeMenuPayload(getMockMenu(userLanguage))
   }
 
   const schema = buildMenuRecognitionSchema()
   const payload = await requestMenuExtraction({
-    imagePath,
-    mimeType,
+    images: normalizeRecognitionImages({ images, imageBase64, mimeType }),
     userLanguage,
     schema,
   })
@@ -231,11 +230,13 @@ async function recognizeMenu({ imagePath, mimeType, userLanguage }) {
   return normalizeMenuPayload(payload)
 }
 
-async function requestMenuExtraction({ imagePath, mimeType, userLanguage, schema }) {
-  const imageBase64 = await readFileAsBase64(imagePath)
+async function requestMenuExtraction({ images, userLanguage, schema }) {
   const messages = buildMenuRecognitionMessages({
-    imageBase64,
-    mimeType,
+    images,
+    userLanguageLabel: userLanguage,
+  })
+  const volcInput = buildMenuRecognitionInput({
+    images,
     userLanguageLabel: userLanguage,
   })
 
@@ -243,7 +244,28 @@ async function requestMenuExtraction({ imagePath, mimeType, userLanguage, schema
     messages,
     schema,
     schemaName: 'menu_extraction',
+    volcInput,
   })
+}
+
+function normalizeRecognitionImages({ images, imageBase64, mimeType }) {
+  if (Array.isArray(images) && images.length) {
+    return images
+      .filter((image) => image && image.imageBase64 && image.mimeType)
+      .map((image) => ({
+        imageBase64: image.imageBase64,
+        mimeType: image.mimeType,
+      }))
+  }
+
+  if (imageBase64 && mimeType) {
+    return [{
+      imageBase64,
+      mimeType,
+    }]
+  }
+
+  throw new Error('缺少菜单图片')
 }
 
 module.exports = {

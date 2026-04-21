@@ -6,6 +6,10 @@ const env = {
     apiUrl: 'https://menu-helper-openrouter-proxy.2012sft.workers.dev/api/chat/completions',
     models: ['google/gemini-3-flash-preview', 'qwen/qwen3.6-plus', 'moonshotai/kimi-k2.5'],
   },
+  features: {
+    // 代码级开关。默认 1 表示单图；改成 2 及以上即可开启多图上传。
+    menuUploadMaxCount: 3,
+  },
   volcengine: {
     forced: false,
     baseUrl: 'https://ark.cn-beijing.volces.com/api/v3',
