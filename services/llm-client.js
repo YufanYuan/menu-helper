@@ -56,6 +56,10 @@ function shouldUseVolcEngine() {
 }
 
 function requestStructuredChatCompletion({ messages, schema, schemaName, volcInput }) {
+  if (!env.isReady()) {
+    return Promise.reject(new Error('配置尚未加载完成，请稍后重试'))
+  }
+
   if (shouldUseVolcEngine()) {
     return requestVolcEngineStructuredChatCompletion({
       messages,

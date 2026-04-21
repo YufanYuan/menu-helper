@@ -11,20 +11,23 @@ const languageOptions = ['中文', 'English', '日本語', '한국어']
 Page({
   data: {
     imagePaths: [],
-    uploadLimit: getMenuImageUploadLimit(),
+    uploadLimit: 1,
     selectedLanguageIndex: 0,
     languageOptions,
+    isConfigLoading: true,
+    configLoadError: '',
     isAnalyzing: false,
-    loadingTitle: '正在识别菜单',
-    loadingSubtitle: '通常需要约 1 分钟，请稍候',
+    loadingTitle: '正在加载配置',
+    loadingSubtitle: '首次进入会先同步服务配置，请稍候',
   },
 
-  onLoad() {
+  async onLoad() {
     const session = sessionStore.getState()
     if (session.recognitionStatus !== 'ready') {
       sessionStore.clearSession()
     }
 
+    await this.ensureConfigReady()
     this.syncSettings()
   },
 
@@ -68,6 +71,22 @@ Page({
   },
 
   async handleRecognize() {
+    if (this.data.isConfigLoading) {
+      wx.showToast({
+        title: '配置加载中，请稍候',
+        icon: 'none',
+      })
+      return
+    }
+
+    if (this.data.configLoadError) {
+      wx.showToast({
+        title: '请先完成配置加载',
+        icon: 'none',
+      })
+      return
+    }
+
     if (!this.data.imagePaths.length || this.data.isAnalyzing) {
       if (!this.data.imagePaths.length) {
         wx.showToast({
@@ -130,6 +149,33 @@ Page({
       selectedLanguageIndex,
       uploadLimit: getMenuImageUploadLimit(),
     })
+  },
+
+  async ensureConfigReady(forceRefresh) {
+    this.setData({
+      isConfigLoading: true,
+      configLoadError: '',
+      loadingTitle: '正在加载配置',
+      loadingSubtitle: '首次进入会先同步服务配置，请稍候',
+    })
+
+    try {
+      await getApp().ensureEnvReady(forceRefresh)
+      this.setData({
+        isConfigLoading: false,
+        configLoadError: '',
+      })
+    } catch (error) {
+      this.setData({
+        isConfigLoading: false,
+        configLoadError: error.message || '配置加载失败',
+      })
+    }
+  },
+
+  async handleRetryConfig() {
+    await this.ensureConfigReady(true)
+    this.syncSettings()
   },
 
   async prepareRecognitionImages(imagePaths) {

@@ -3,6 +3,14 @@
 <view class="page-shell">
 
   <view class="page-body">
+    <view wx:if="{{configLoadError}}" class="card settings-card">
+      <view>
+        <text class="section-title">配置加载失败</text>
+        <text class="section-subtitle">{{configLoadError}}</text>
+      </view>
+      <button class="primary-button" bindtap="handleRetryConfig">重试加载配置</button>
+    </view>
+
     <image-picker
       imagePaths="{{imagePaths}}"
       uploadLimit="{{uploadLimit}}"
@@ -23,10 +31,10 @@
       </picker>
     </view>
 
-    <button class="primary-button action-button {{!imagePaths.length ? 'disabled' : ''}}" bindtap="handleRecognize">
+    <button class="primary-button action-button {{!imagePaths.length || isConfigLoading || configLoadError ? 'disabled' : ''}}" bindtap="handleRecognize">
       识别菜单
     </button>
   </view>
 </view>
 
-<loading-mask visible="{{isAnalyzing}}" title="{{loadingTitle}}" subtitle="{{loadingSubtitle}}" estimateSeconds="{{60}}" targetProgress="{{0.8}}"></loading-mask>
+<loading-mask visible="{{isConfigLoading || isAnalyzing}}" title="{{loadingTitle}}" subtitle="{{loadingSubtitle}}" estimateSeconds="{{isConfigLoading ? 8 : 60}}" targetProgress="{{isConfigLoading ? 0.6 : 0.8}}"></loading-mask>
