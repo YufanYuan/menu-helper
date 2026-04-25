@@ -1,6 +1,7 @@
 const sessionStore = require('../../store/session-store')
 const settingsStore = require('../../store/settings-store')
 const { hideShareMenu } = require('../../utils/share')
+const { trackEvent } = require('../../utils/analytics')
 
 const switchOptions = [
   { label: '当地语言', value: 'original' },
@@ -18,6 +19,12 @@ Page({
   onShow() {
     hideShareMenu()
     this.refreshData()
+    const summary = sessionStore.getSummary()
+    trackEvent('order_card_page_view', {
+      display_mode: settingsStore.getState().orderDisplayMode,
+      cart_total_count: summary.totalCount,
+      distinct_item_count: summary.cartItems.length,
+    }, 'order_card')
   },
 
   refreshData() {
@@ -37,8 +44,14 @@ Page({
   },
 
   handleModeChange(event) {
+    const previousMode = this.data.displayMode
     settingsStore.setOrderDisplayMode(event.detail.value)
     this.refreshData()
+    trackEvent('order_card_mode_switch', {
+      previous_display_mode: previousMode,
+      display_mode: event.detail.value,
+      item_count: this.data.items.length,
+    }, 'order_card')
   },
 
   handleCopy() {
@@ -53,6 +66,12 @@ Page({
     wx.setClipboardData({
       data: this.data.orderSummaryText,
     })
+    trackEvent('order_card_copy', {
+      display_mode: this.data.displayMode,
+      item_count: this.data.items.length,
+      text_length: this.data.orderSummaryText.length,
+      cart_total_count: sessionStore.getSummary().totalCount,
+    }, 'order_card')
   },
 
   handleBackToPreview() {

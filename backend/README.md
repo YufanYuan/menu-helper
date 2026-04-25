@@ -5,7 +5,7 @@
 - `POST /api/chat/completions`
 - 基于 `wechat_code` 调用微信 `code2Session` 获取用户 `openid`
 - 转发 OpenRouter chat completions（当前仅支持 `stream: false`）
-- 在 Cloudflare Worker 环境中，自动启用 Analytics Engine 并写入 usage/cost/地区/状态/时延
+- 在 Cloudflare Worker 环境中，自动启用 Analytics Engine 并写入 usage/cost/地区/状态/时延，并关联 `session_id` / `client_request_id`
 - 在非 Cloudflare 环境中，可复用同一套 handler，并按需注入自己的 analytics/logger/storage 能力
 - 该接口当前仅服务国际流量；中国大陆/俄罗斯用户由小程序端直接请求火山引擎豆包模型
 
@@ -71,13 +71,17 @@ npm run deploy
   1. event_type
   2. openid
   3. model
-  4. request_country
-  5. request_city
-  6. request_region
-  7. request_timezone
-  8. request_colo
-  9. created_at
-  10. request_id
+  4. session_id
+  5. client_request_id
+  6. request_country
+  7. request_city
+  8. request_region
+  9. request_timezone
+  10. request_colo
+  11. created_at
+  12. request_id
+  13. failed_stage
+  14. error_message
 - `doubles`
   1. prompt_tokens
   2. completion_tokens
@@ -87,5 +91,6 @@ npm run deploy
   6. status_code
   7. latency_ms
   8. stream (0/1)
+  9. is_success (0/1)
 - `indexes`
   1. request_id

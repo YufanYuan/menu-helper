@@ -17,16 +17,21 @@ export interface AnalyticsEngineDatasetBinding {
 }
 
 export interface AnalyticsEventInput {
+  clientRequestId?: string;
+  createdAt: string;
+  errorMessage?: string;
   eventType: string;
+  failedStage?: string;
+  isSuccess?: boolean;
+  latencyMs: number;
+  location?: RequestLocation;
   openid: string;
   model: string;
+  requestId: string;
+  sessionId?: string;
   stream: boolean;
   statusCode: number;
-  latencyMs: number;
   usage: OpenRouterUsage;
-  location?: RequestLocation;
-  createdAt: string;
-  requestId: string;
 }
 
 export interface AnalyticsWriter {
@@ -52,6 +57,8 @@ function writeCloudflareUsageEvent(
       event.eventType,
       event.openid,
       event.model,
+      toBlobValue(event.sessionId),
+      toBlobValue(event.clientRequestId),
       country,
       city,
       region,
@@ -59,6 +66,8 @@ function writeCloudflareUsageEvent(
       colo,
       event.createdAt,
       event.requestId,
+      toBlobValue(event.failedStage),
+      toBlobValue(event.errorMessage),
     ],
     doubles: [
       event.usage.prompt_tokens,
@@ -69,6 +78,7 @@ function writeCloudflareUsageEvent(
       event.statusCode,
       event.latencyMs,
       event.stream ? 1 : 0,
+      event.isSuccess ? 1 : 0,
     ],
     indexes: [event.requestId],
   });

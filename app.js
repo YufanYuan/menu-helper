@@ -1,5 +1,6 @@
 const settingsStore = require('./store/settings-store')
 const env = require('./config/env')
+const { trackEvent } = require('./utils/analytics')
 
 function normalizeCountry(value) {
   if (typeof value !== 'string') {
@@ -13,6 +14,11 @@ function normalizeCountry(value) {
 App({
   onLaunch() {
     this.globalData.deviceInfo = wx.getSystemInfoSync()
+    trackEvent('app_launch', {
+      platform_brand: (this.globalData.deviceInfo && this.globalData.deviceInfo.brand) || '',
+      platform_model: (this.globalData.deviceInfo && this.globalData.deviceInfo.model) || '',
+      system_name: (this.globalData.deviceInfo && this.globalData.deviceInfo.system) || '',
+    }, 'app')
     this.ensureEnvReady().catch(() => {})
     this.resolveClientCountry()
   },

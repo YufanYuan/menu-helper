@@ -2,6 +2,7 @@ const sessionStore = require('../../store/session-store')
 const settingsStore = require('../../store/settings-store')
 const { ALL_CATEGORY, buildCategories, filterItemsByCategory, formatPrice } = require('../../domain/menu')
 const { hideShareMenu } = require('../../utils/share')
+const { trackEvent } = require('../../utils/analytics')
 
 const LANGUAGE_LABELS = {
   ar: 'العربية',
@@ -60,11 +61,25 @@ Page({
         totalPriceLabel: '0.00',
         menuScrollTop: 0,
       })
+      trackEvent('menu_page_view', {
+        has_menu: false,
+        recognized_item_count: 0,
+        cart_total_count: 0,
+      }, 'menu')
       return
     }
 
     this.refreshData()
     this.updateMenuListHeight()
+    const summary = sessionStore.getSummary()
+    trackEvent('menu_page_view', {
+      has_menu: true,
+      menu_language: session.menuLanguage,
+      recognized_item_count: session.items.length,
+      recognized_category_count: buildCategories(session.items).length - 1,
+      cart_total_count: summary.totalCount,
+      distinct_item_count: summary.cartItems.length,
+    }, 'menu')
   },
 
   refreshData(nextCategory) {
@@ -103,14 +118,21 @@ Page({
       return
     }
 
+    trackEvent('menu_category_switch', {
+      previous_category: this.data.activeCategory,
+      next_category: nextCategory,
+    }, 'menu')
     this.resetMenuScrollTop()
     this.refreshData(nextCategory)
   },
 
   handleQuantityChange(event) {
     const { itemId, value } = event.detail
+    const session = sessionStore.getState()
+    const previousQuantity = Number(session.cart[itemId] || 0)
     sessionStore.updateQuantity(itemId, value)
     this.syncQuantityState(itemId, value)
+    trackCartChange(itemId, previousQuantity, value)
   },
 
   handlePreview() {
@@ -122,12 +144,22 @@ Page({
       return
     }
 
+    trackEvent('menu_preview_enter', {
+      cart_total_count: this.data.totalCount,
+      total_price: parsePriceLabel(this.data.totalPriceLabel),
+      distinct_item_count: sessionStore.getSummary().cartItems.length,
+    }, 'menu')
     wx.navigateTo({
       url: '/pages/order-preview/index',
     })
   },
 
   handleRestart() {
+    trackEvent('menu_session_restart', {
+      restart_reason: 'empty_restart',
+      cart_total_count: this.data.totalCount,
+      recognized_item_count: sessionStore.getState().items.length,
+    }, 'menu')
     navigateBackOrHome()
   },
 
@@ -147,6 +179,11 @@ Page({
           return
         }
 
+        trackEvent('menu_session_restart', {
+          restart_reason: 'back_confirm',
+          cart_total_count: this.data.totalCount,
+          recognized_item_count: sessionStore.getState().items.length,
+        }, 'menu')
         sessionStore.clearSession()
         navigateBackOrHome()
       },
@@ -234,4 +271,35 @@ function formatLanguageLabel(value) {
   }
 
   return LANGUAGE_LABELS[label.toLowerCase()] || label
+}
+
+function parsePriceLabel(value) {
+  const match = String(value || '').match(/([0-9]+(?:\.[0-9]+)?)$/)
+  return match ? Number(match[1]) : 0
+}
+
+function trackCartChange(itemId, previousQuantity, nextQuantity) {
+  const session = sessionStore.getState()
+  const summary = sessionStore.getSummary()
+  const item = session.items.find((currentItem) => currentItem.id === itemId) || {}
+  const safeNextQuantity = Math.max(0, Number(nextQuantity) || 0)
+  let eventId = 'menu_cart_item_update'
+
+  if (previousQuantity === 0 && safeNextQuantity > 0) {
+    eventId = 'menu_cart_item_add'
+  } else if (previousQuantity > 0 && safeNextQuantity === 0) {
+    eventId = 'menu_cart_item_remove'
+  }
+
+  trackEvent(eventId, {
+    item_id: itemId,
+    item_name: item.translatedName || item.originalName || '',
+    item_category: item.translatedCategory || '',
+    item_price: Number(item.priceValue) || 0,
+    previous_quantity: previousQuantity,
+    new_quantity: safeNextQuantity,
+    quantity_delta: safeNextQuantity - previousQuantity,
+    cart_total_count: summary.totalCount,
+    cart_total_price: summary.totalPrice,
+  }, 'menu')
 }

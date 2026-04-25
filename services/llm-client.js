@@ -55,7 +55,18 @@ function shouldUseVolcEngine() {
   return DIRECT_VOLC_COUNTRIES[normalizeCountry(settingsStore.getState().clientCountry)]
 }
 
-function requestStructuredChatCompletion({ messages, schema, schemaName, volcInput }) {
+function getPreferredProvider() {
+  return shouldUseVolcEngine() ? 'volcengine' : 'cloudflare'
+}
+
+function requestStructuredChatCompletion({
+  messages,
+  schema,
+  schemaName,
+  volcInput,
+  clientRequestId,
+  sessionId,
+}) {
   if (!env.isReady()) {
     return Promise.reject(new Error('配置尚未加载完成，请稍后重试'))
   }
@@ -66,13 +77,27 @@ function requestStructuredChatCompletion({ messages, schema, schemaName, volcInp
       schema,
       schemaName,
       input: volcInput,
+      clientRequestId,
+      sessionId,
     })
   }
 
-  return requestOpenRouterStructuredChatCompletion({ messages, schema, schemaName })
+  return requestOpenRouterStructuredChatCompletion({
+    messages,
+    schema,
+    schemaName,
+    clientRequestId,
+    sessionId,
+  })
 }
 
-function requestOpenRouterStructuredChatCompletion({ messages, schema, schemaName }) {
+function requestOpenRouterStructuredChatCompletion({
+  messages,
+  schema,
+  schemaName,
+  clientRequestId,
+  sessionId,
+}) {
   const config = env.cloudflare || {}
   const hasModels = Array.isArray(config.models) && config.models.length > 0
 
@@ -99,6 +124,8 @@ function requestOpenRouterStructuredChatCompletion({ messages, schema, schemaNam
             require_parameters: true,
           },
           structured_outputs: true,
+          client_request_id: clientRequestId,
+          session_id: sessionId,
         }
 
         if (hasModels) {
@@ -156,7 +183,14 @@ function requestOpenRouterStructuredChatCompletion({ messages, schema, schemaNam
   )
 }
 
-function requestVolcEngineStructuredChatCompletion({ messages, schema, schemaName, input }) {
+function requestVolcEngineStructuredChatCompletion({
+  messages,
+  schema,
+  schemaName,
+  input,
+  clientRequestId,
+  sessionId,
+}) {
   const config = env.volcengine || {}
 
   if (!config.apiKey || !config.baseUrl || !config.model) {
@@ -412,4 +446,5 @@ function extractChatCompletionText(response) {
 
 module.exports = {
   requestStructuredChatCompletion,
+  getPreferredProvider,
 }

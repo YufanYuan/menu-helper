@@ -215,7 +215,14 @@ function getLanguageCopy(userLanguage) {
   }
 }
 
-async function recognizeMenu({ images, imageBase64, mimeType, userLanguage }) {
+async function recognizeMenu({
+  images,
+  imageBase64,
+  mimeType,
+  userLanguage,
+  clientRequestId,
+  sessionId,
+}) {
   if (env.useMockLLM) {
     return normalizeMenuPayload(getMockMenu(userLanguage))
   }
@@ -225,12 +232,14 @@ async function recognizeMenu({ images, imageBase64, mimeType, userLanguage }) {
     images: normalizeRecognitionImages({ images, imageBase64, mimeType }),
     userLanguage,
     schema,
+    clientRequestId,
+    sessionId,
   })
 
   return normalizeMenuPayload(payload)
 }
 
-async function requestMenuExtraction({ images, userLanguage, schema }) {
+async function requestMenuExtraction({ images, userLanguage, schema, clientRequestId, sessionId }) {
   const messages = buildMenuRecognitionMessages({
     images,
     userLanguageLabel: userLanguage,
@@ -245,6 +254,8 @@ async function requestMenuExtraction({ images, userLanguage, schema }) {
     schema,
     schemaName: 'menu_extraction',
     volcInput,
+    clientRequestId,
+    sessionId,
   })
 }
 

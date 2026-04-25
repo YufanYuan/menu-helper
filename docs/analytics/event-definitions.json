@@ -1,0 +1,657 @@
+{
+  "property_definitions": [
+    {
+      "key": "app_version",
+      "desc": "菜单助手应用版本",
+      "comment": "当前小程序版本号或环境版本。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "cart_total_count",
+      "desc": "购物车总数量",
+      "comment": "当前购物车内所有菜品数量之和。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "cart_total_price",
+      "desc": "购物车总金额",
+      "comment": "当前购物车内所有已选菜品的小计金额之和。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "client_country",
+      "desc": "客户端国家",
+      "comment": "根据客户端IP推断出的国家码。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "client_request_id",
+      "desc": "客户端请求ID",
+      "comment": "前端发起识别时生成的请求标识。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "config_load_error",
+      "desc": "配置加载错误",
+      "comment": "首页配置加载失败时的错误信息。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "config_ready",
+      "desc": "配置是否可用",
+      "comment": "首页配置是否已可用，1可用0不可用。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "currency",
+      "desc": "币种",
+      "comment": "识别结果中的菜单币种，如EUR或USD。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "distinct_item_count",
+      "desc": "去重菜品数",
+      "comment": "当前已选或已识别的去重菜品数。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "display_mode",
+      "desc": "展示模式",
+      "comment": "点单卡当前展示模式。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "error_message",
+      "desc": "错误信息",
+      "comment": "事件失败时记录的错误信息。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "failed_stage",
+      "desc": "失败阶段",
+      "comment": "后端或识别链路中发生失败的阶段。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "force_refresh",
+      "desc": "是否强制刷新",
+      "comment": "配置加载时是否为主动重试。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "has_menu",
+      "desc": "是否有菜单结果",
+      "comment": "菜单页是否存在有效识别结果。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "image_count",
+      "desc": "图片数量",
+      "comment": "当前识别请求中实际使用的菜单图片数量。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "is_retry",
+      "desc": "是否重试",
+      "comment": "本次识别是否为失败后的重试。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "item_category",
+      "desc": "菜品分类",
+      "comment": "菜品所属分类，如主菜或饮品。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "item_count",
+      "desc": "菜品数量",
+      "comment": "事件上下文中的菜品条目数。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "item_id",
+      "desc": "菜品ID",
+      "comment": "结构化识别结果中的菜品唯一标识。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "item_name",
+      "desc": "菜品名称",
+      "comment": "当前操作的菜品名称。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "item_price",
+      "desc": "菜品价格",
+      "comment": "当前操作菜品的单价金额。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "latency_ms",
+      "desc": "耗时毫秒",
+      "comment": "一次请求或处理链路的总耗时毫秒数。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "menu_language",
+      "desc": "菜单原语言",
+      "comment": "识别出的菜单原始语言。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "menu_upload_max_count",
+      "desc": "菜单上传上限",
+      "comment": "当前配置允许上传的菜单图片数量上限。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "merge_mode",
+      "desc": "图片合并方式",
+      "comment": "图片选择后的合并策略。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "model",
+      "desc": "模型名称",
+      "comment": "后端实际调用的大模型名称。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "new_quantity",
+      "desc": "新数量",
+      "comment": "调整数量后的最新值。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "next_category",
+      "desc": "目标分类",
+      "comment": "切换分类操作后的目标分类名称。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "order_display_mode",
+      "desc": "点单卡默认模式",
+      "comment": "用户设置中保存的点单卡默认展示模式。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "open_id",
+      "desc": "菜单助手OpenID",
+      "comment": "后端解析出的微信用户OpenID。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "page_name",
+      "desc": "页面名",
+      "comment": "当前事件所属页面名称。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "platform",
+      "desc": "平台",
+      "comment": "事件来源平台，目前主要为miniapp。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "platform_brand",
+      "desc": "菜单助手设备品牌",
+      "comment": "客户端设备品牌信息。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "platform_model",
+      "desc": "菜单助手设备型号",
+      "comment": "客户端设备型号信息。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "prefilled_item_count",
+      "desc": "预填菜品数",
+      "comment": "识别结果中带有初始数量的菜品数。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "previous_category",
+      "desc": "原分类",
+      "comment": "分类切换前的当前分类名称。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "previous_display_mode",
+      "desc": "原展示模式",
+      "comment": "点单卡切换前的展示模式。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "previous_language",
+      "desc": "原翻译语言",
+      "comment": "用户切换翻译语言前的语言值。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "previous_quantity",
+      "desc": "原数量",
+      "comment": "菜品调整前的数量值。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "provider_actual",
+      "desc": "实际服务提供方",
+      "comment": "本次识别实际使用的服务提供方。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "provider_expected",
+      "desc": "预期服务提供方",
+      "comment": "识别发起前推断出的目标服务提供方。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "quantity_delta",
+      "desc": "数量变化量",
+      "comment": "本次操作前后数量差值。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "recognition_status",
+      "desc": "识别状态",
+      "comment": "当前会话识别状态。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "recognized_category_count",
+      "desc": "识别分类数",
+      "comment": "本次菜单识别结果中的分类数量。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "recognized_item_count",
+      "desc": "识别菜品数",
+      "comment": "本次菜单识别结果中的菜品数量。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "request_id",
+      "desc": "服务端请求ID",
+      "comment": "后端生成的请求唯一标识。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "restart_reason",
+      "desc": "重启原因",
+      "comment": "用户放弃或重启当前菜单会话的原因。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "selected_count",
+      "desc": "本次选择数量",
+      "comment": "本次选择图片动作中新加入的图片数。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "selected_language",
+      "desc": "当前翻译语言",
+      "comment": "用户切换后的目标翻译语言。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "session_id",
+      "desc": "会话ID",
+      "comment": "一次菜单识别与点餐链路的会话标识。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "share_channel",
+      "desc": "分享渠道",
+      "comment": "分享动作的渠道类型。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "source_type",
+      "desc": "图片来源",
+      "comment": "菜单图片来源，如camera或album。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "status_code",
+      "desc": "状态码",
+      "comment": "后端请求或上游调用返回的状态码。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "stream",
+      "desc": "是否流式",
+      "comment": "后端请求是否使用流式返回。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "system_name",
+      "desc": "菜单助手系统版本",
+      "comment": "客户端系统名称与版本信息。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    },
+    {
+      "key": "text_length",
+      "desc": "文本长度",
+      "comment": "点单卡复制文本的字符长度。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "total_image_count",
+      "desc": "当前总图片数",
+      "comment": "当前页面已经选中的菜单图片总数。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "total_price",
+      "desc": "总金额",
+      "comment": "当前订单总金额。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "upload_limit",
+      "desc": "上传上限",
+      "comment": "当前页面可继续上传的图片上限配置。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "usage_completion_tokens",
+      "desc": "输出Token数",
+      "comment": "上游模型响应生成的completion token数。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "usage_cost_usd_estimate",
+      "desc": "预估美元成本",
+      "comment": "一次模型调用对应的预估美元成本。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "usage_prompt_tokens",
+      "desc": "输入Token数",
+      "comment": "上游模型请求消耗的prompt token数。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "usage_reasoning_tokens",
+      "desc": "推理Token数",
+      "comment": "上游模型额外消耗的reasoning token数。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "usage_total_tokens",
+      "desc": "总Token数",
+      "comment": "一次模型调用的总token数量。",
+      "key_type": "KEY_TYPE_INT64",
+      "dict_name": ""
+    },
+    {
+      "key": "user_language",
+      "desc": "用户目标语言",
+      "comment": "用户在首页选择的翻译目标语言。",
+      "key_type": "KEY_TYPE_STRING",
+      "dict_name": ""
+    }
+  ],
+  "event_definitions": [
+    {
+      "event_id": "app_launch",
+      "event_name": "应用启动",
+      "event_comment": "小程序启动时上报一次，用于统计设备分布与启动量。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "platform", "platform_brand", "platform_model", "system_name", "app_version", "client_country"]
+    },
+    {
+      "event_id": "home_page_view",
+      "event_name": "首页曝光",
+      "event_comment": "用户进入首页时上报，用于统计首页到识别的转化漏斗。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "client_country", "user_language", "image_count", "upload_limit", "config_ready", "config_load_error", "recognition_status", "app_version"]
+    },
+    {
+      "event_id": "home_config_load_start",
+      "event_name": "首页配置加载开始",
+      "event_comment": "首页开始拉取远端配置。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "force_refresh", "client_country", "app_version"]
+    },
+    {
+      "event_id": "home_config_load_success",
+      "event_name": "首页配置加载成功",
+      "event_comment": "首页远端配置加载成功。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "force_refresh", "latency_ms", "menu_upload_max_count", "client_country", "app_version"]
+    },
+    {
+      "event_id": "home_config_load_fail",
+      "event_name": "首页配置加载失败",
+      "event_comment": "首页远端配置加载失败，用于监控配置服务可用性。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "force_refresh", "latency_ms", "error_message", "client_country", "app_version"]
+    },
+    {
+      "event_id": "home_image_select",
+      "event_name": "首页选择菜单图片",
+      "event_comment": "用户拍照或从相册选择菜单图片。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "source_type", "selected_count", "total_image_count", "merge_mode", "upload_limit", "client_country", "user_language"]
+    },
+    {
+      "event_id": "home_image_clear",
+      "event_name": "首页清空菜单图片",
+      "event_comment": "用户在首页清空已选菜单图片。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "total_image_count", "client_country", "user_language"]
+    },
+    {
+      "event_id": "home_language_select",
+      "event_name": "首页选择翻译语言",
+      "event_comment": "用户切换识别结果展示语言。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "previous_language", "selected_language", "client_country"]
+    },
+    {
+      "event_id": "home_menu_recognition_submit",
+      "event_name": "提交菜单识别",
+      "event_comment": "用户点击识别菜单，是识别漏斗的起点。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "client_request_id", "image_count", "user_language", "provider_expected", "is_retry", "client_country"]
+    },
+    {
+      "event_id": "home_menu_recognition_success",
+      "event_name": "菜单识别成功",
+      "event_comment": "菜单识别成功返回结构化结果。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "client_request_id", "provider_actual", "latency_ms", "menu_language", "currency", "recognized_item_count", "recognized_category_count", "prefilled_item_count", "user_language", "client_country"]
+    },
+    {
+      "event_id": "home_menu_recognition_fail",
+      "event_name": "菜单识别失败",
+      "event_comment": "菜单识别失败，用于监控失败率与错误原因。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "client_request_id", "provider_actual", "latency_ms", "error_message", "user_language", "client_country"]
+    },
+    {
+      "event_id": "menu_page_view",
+      "event_name": "菜单页曝光",
+      "event_comment": "用户进入菜单浏览页。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "has_menu", "recognized_item_count", "recognized_category_count", "cart_total_count", "distinct_item_count", "menu_language", "user_language", "client_country"]
+    },
+    {
+      "event_id": "menu_category_switch",
+      "event_name": "切换菜单分类",
+      "event_comment": "用户在菜单页切换分类筛选。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "previous_category", "next_category", "cart_total_count", "client_country"]
+    },
+    {
+      "event_id": "menu_cart_item_add",
+      "event_name": "菜单页加菜",
+      "event_comment": "购物车内某个菜品从0加到大于0。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "item_id", "item_name", "item_category", "item_price", "previous_quantity", "new_quantity", "quantity_delta", "cart_total_count", "cart_total_price", "client_country"]
+    },
+    {
+      "event_id": "menu_cart_item_remove",
+      "event_name": "菜单页移除菜品",
+      "event_comment": "购物车内某个菜品从大于0减到0。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "item_id", "item_name", "item_category", "item_price", "previous_quantity", "new_quantity", "quantity_delta", "cart_total_count", "cart_total_price", "client_country"]
+    },
+    {
+      "event_id": "menu_cart_item_update",
+      "event_name": "菜单页更新菜品数量",
+      "event_comment": "购物车内某个菜品数量在大于0区间内发生变化。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "item_id", "item_name", "item_category", "item_price", "previous_quantity", "new_quantity", "quantity_delta", "cart_total_count", "cart_total_price", "client_country"]
+    },
+    {
+      "event_id": "menu_preview_enter",
+      "event_name": "进入点餐确认页",
+      "event_comment": "用户从菜单页进入订单预览页。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "cart_total_count", "distinct_item_count", "total_price", "client_country", "user_language"]
+    },
+    {
+      "event_id": "menu_session_restart",
+      "event_name": "菜单会话重启",
+      "event_comment": "用户在菜单页返回首页或放弃当前识别会话。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "restart_reason", "cart_total_count", "recognized_item_count", "client_country"]
+    },
+    {
+      "event_id": "order_preview_page_view",
+      "event_name": "订单预览页曝光",
+      "event_comment": "用户进入订单预览页。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "cart_total_count", "distinct_item_count", "total_price", "client_country", "user_language"]
+    },
+    {
+      "event_id": "order_preview_item_update",
+      "event_name": "订单预览调整数量",
+      "event_comment": "用户在订单预览页继续调整菜品数量。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "item_id", "item_name", "previous_quantity", "new_quantity", "quantity_delta", "cart_total_count", "total_price", "client_country"]
+    },
+    {
+      "event_id": "order_preview_confirm",
+      "event_name": "确认生成点单卡",
+      "event_comment": "用户从预览页确认进入点单卡，是高意图转化事件。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "cart_total_count", "distinct_item_count", "total_price", "client_country", "user_language"]
+    },
+    {
+      "event_id": "order_card_page_view",
+      "event_name": "点单卡页曝光",
+      "event_comment": "用户进入点单卡页。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "display_mode", "cart_total_count", "distinct_item_count", "client_country", "order_display_mode"]
+    },
+    {
+      "event_id": "order_card_mode_switch",
+      "event_name": "切换点单卡展示模式",
+      "event_comment": "用户在当地语言和我的语言之间切换。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "previous_display_mode", "display_mode", "item_count", "client_country"]
+    },
+    {
+      "event_id": "order_card_copy",
+      "event_name": "复制点单卡内容",
+      "event_comment": "用户复制点单文本，视为当前版本的核心完成事件。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "display_mode", "item_count", "text_length", "cart_total_count", "client_country"]
+    },
+    {
+      "event_id": "share_home_app_message",
+      "event_name": "首页分享给好友",
+      "event_comment": "用户从首页触发分享给好友。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "share_channel", "client_country", "user_language"]
+    },
+    {
+      "event_id": "share_home_timeline",
+      "event_name": "首页分享到朋友圈",
+      "event_comment": "用户从首页触发分享到朋友圈。",
+      "report_src": 0,
+      "event_key_list": ["page_name", "session_id", "share_channel", "client_country", "user_language"]
+    },
+    {
+      "event_id": "backend_chat_completion_success",
+      "event_name": "后端聊天补全成功",
+      "event_comment": "Cloudflare 后端代理 OpenRouter 成功返回结果。",
+      "report_src": 1,
+      "event_key_list": ["session_id", "client_request_id", "request_id", "open_id", "model", "status_code", "latency_ms", "stream", "usage_prompt_tokens", "usage_completion_tokens", "usage_reasoning_tokens", "usage_total_tokens", "usage_cost_usd_estimate", "client_country"]
+    },
+    {
+      "event_id": "backend_chat_completion_fail",
+      "event_name": "后端聊天补全失败",
+      "event_comment": "Cloudflare 后端代理 OpenRouter 失败返回。",
+      "report_src": 1,
+      "event_key_list": ["session_id", "client_request_id", "request_id", "open_id", "model", "status_code", "latency_ms", "stream", "failed_stage", "error_message", "client_country"]
+    }
+  ]
+}

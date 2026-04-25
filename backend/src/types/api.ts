@@ -10,9 +10,11 @@ export interface ChatMessage {
 
 export interface ChatCompletionRequest {
   wechat_code: string;
+  client_request_id?: string;
   model?: string;
   models?: string[];
   messages: ChatMessage[];
+  session_id?: string;
   stream?: boolean;
   temperature?: number;
   max_tokens?: number;

@@ -69,7 +69,11 @@ Component({
       try {
         const files = await chooseImages(sourceType, count)
         const mergeMode = mergeModeOverride || (this.isSingleUploadMode() ? 'replace' : 'append')
-        this.triggerEvent('selected', { files, mergeMode })
+        this.triggerEvent('selected', {
+          files,
+          mergeMode,
+          sourceType: Array.isArray(sourceType) ? sourceType.join(',') : '',
+        })
       } catch (error) {
         if (error && error.errMsg && error.errMsg.includes('cancel')) {
           return

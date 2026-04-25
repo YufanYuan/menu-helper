@@ -60,6 +60,10 @@ function validateBody(payload: unknown): { valid: true; data: ChatCompletionRequ
     return { valid: false, message: 'model must be a string' };
   }
 
+  if (data.client_request_id !== undefined && typeof data.client_request_id !== 'string') {
+    return { valid: false, message: 'client_request_id must be a string' };
+  }
+
   if (
     data.models !== undefined &&
     (!Array.isArray(data.models) ||
@@ -75,6 +79,10 @@ function validateBody(payload: unknown): { valid: true; data: ChatCompletionRequ
 
   if (!Array.isArray(data.messages) || data.messages.length === 0) {
     return { valid: false, message: 'messages is required and must be a non-empty array' };
+  }
+
+  if (data.session_id !== undefined && typeof data.session_id !== 'string') {
+    return { valid: false, message: 'session_id must be a string' };
   }
 
   if (data.stream === true) {
@@ -177,16 +185,19 @@ export async function handleChatCompletions(
 
     try {
       writeUsageEvent(runtimeContext.analyticsWriter, {
-        eventType: 'chat_completion',
+        clientRequestId: body.client_request_id,
+        createdAt,
+        eventType: 'backend_chat_completion_success',
+        isSuccess: true,
+        latencyMs,
+        location: runtimeContext.requestLocation,
         openid,
         model: upstreamPayload.model ?? requestedModelLabel,
+        requestId,
+        sessionId: body.session_id,
         stream: false,
         statusCode: 200,
-        latencyMs,
         usage,
-        location: runtimeContext.requestLocation,
-        createdAt,
-        requestId,
       });
     } catch (analyticsError) {
       console.error('ANALYTICS_WRITE_FAILED', {
@@ -210,13 +221,24 @@ export async function handleChatCompletions(
     const createdAt = new Date().toISOString();
 
     try {
+      const errorMessage =
+        error instanceof Error ? error.message : 'OpenRouter upstream request failed';
+
       writeUsageEvent(runtimeContext.analyticsWriter, {
-        eventType: 'chat_completion',
+        clientRequestId: body.client_request_id,
+        createdAt,
+        errorMessage,
+        eventType: 'backend_chat_completion_fail',
+        failedStage: 'openrouter_upstream',
+        isSuccess: false,
+        latencyMs,
+        location: runtimeContext.requestLocation,
         openid,
         model: requestedModelLabel,
+        requestId,
+        sessionId: body.session_id,
         stream: false,
         statusCode: 502,
-        latencyMs,
         usage: {
           prompt_tokens: 0,
           completion_tokens: 0,
@@ -224,9 +246,6 @@ export async function handleChatCompletions(
           total_tokens: 0,
           cost_usd_estimate: 0,
         },
-        location: runtimeContext.requestLocation,
-        createdAt,
-        requestId,
       });
     } catch (analyticsError) {
       console.error('ANALYTICS_WRITE_FAILED', {
