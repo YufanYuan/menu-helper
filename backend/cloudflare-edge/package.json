@@ -1,7 +1,8 @@
 {
-  "name": "menu-helper-backend",
+  "name": "@menu-helper/cloudflare-edge",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.11.0",
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
@@ -9,8 +10,8 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "typescript": "^5.6.3",
-    "wrangler": "^4.11.1",
-    "@cloudflare/workers-types": "^4.20260320.0"
+    "@cloudflare/workers-types": "^4.20260511.1",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.91.0"
   }
 }

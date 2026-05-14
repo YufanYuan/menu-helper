@@ -1,0 +1,13 @@
+{
+  "name": "menu-helper-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.11.0",
+  "scripts": {
+    "dev:edge": "pnpm --filter @menu-helper/cloudflare-edge dev",
+    "deploy:edge": "pnpm --filter @menu-helper/cloudflare-edge deploy",
+    "dev:site": "pnpm --filter @menu-helper/frontend dev",
+    "build:site": "pnpm --filter @menu-helper/frontend build",
+    "typecheck": "pnpm --filter @menu-helper/cloudflare-edge typecheck && pnpm --filter @menu-helper/frontend typecheck"
+  }
+}

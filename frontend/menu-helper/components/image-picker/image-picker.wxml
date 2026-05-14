@@ -7,7 +7,7 @@
   <view wx:else class="placeholder-shell">
     <text class="placeholder-title">上传菜单照片</text>
     <text class="placeholder-subtitle">可以直接拍照，或从相册选择</text>
-    <text class="placeholder-subtitle">目前仅支持单张识别</text>
+    <text class="placeholder-subtitle">最多上传 {{uploadLimit}} 张菜单照片</text>
   </view>
 
   <view wx:if="{{imagePaths.length}}" class="picker-meta">

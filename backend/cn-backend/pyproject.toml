@@ -1,0 +1,16 @@
+[project]
+name = "menu-helper-cn-backend"
+version = "0.1.0"
+description = "China-region backend service for Menu Helper."
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.32.0"
+]
+
+[project.scripts]
+menu-helper-cn-backend = "menu_helper_cn_backend.main:run"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

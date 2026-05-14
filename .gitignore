@@ -1,0 +1,19 @@
+.DS_Store
+
+# Node / pnpm
+node_modules/
+.pnpm-store/
+dist/
+coverage/
+
+# Python / uv
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+# Cloudflare
+.wrangler/
+
+# WeChat mini program generated files
+miniprogram_npm/
