@@ -6,6 +6,25 @@
       <view class="card total-card">
         <text class="section-title">已选 {{totalCount}} 份菜品</text>
         <text class="total-price">合计 {{totalPriceLabel}}</text>
+        <view wx:if="{{isExchangeRateEnabled}}" class="fx-shell">
+          <view class="fx-header">
+            <text class="fx-title">参考换算币种</text>
+            <picker
+              mode="selector"
+              range="{{currencyOptionLabels}}"
+              value="{{selectedCurrencyIndex}}"
+              bindchange="handleCurrencyChange"
+            >
+              <view class="fx-picker">
+                <text>{{currencyOptionLabels[selectedCurrencyIndex]}}</text>
+                <text class="picker-arrow">></text>
+              </view>
+            </picker>
+          </view>
+          <text wx:if="{{referencePriceLabel}}" class="fx-price">约 {{referencePriceLabel}}</text>
+          <text wx:if="{{referenceMetaLabel}}" class="fx-meta">{{referenceMetaLabel}}</text>
+          <text wx:if="{{referenceError}}" class="fx-error">{{referenceError}}</text>
+        </view>
         <text class="section-subtitle">确认菜品和数量后，即可生成给服务员看的点单卡。</text>
       </view>
 

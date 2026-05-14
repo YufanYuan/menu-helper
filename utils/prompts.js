@@ -12,6 +12,7 @@ function buildMenuRecognitionInstruction(userLanguageLabel) {
     'Only fill descriptionOriginal and descriptionTranslated when the menu image actually shows a dish description.',
     'If a dish has no visible description, return empty strings for descriptionOriginal and descriptionTranslated.',
     'Do not invent dishes, descriptions, prices, sizes, options, or categories that are not visible in the image.',
+    'Prefer a three-letter ISO 4217 currency code whenever possible, such as USD, EUR, JPY, or CNY.',
     'priceValue must be numeric and should represent the underlying numeric price when readable.',
     'priceText must be localized for the target language and use the target language writing habit rather than copying the original menu text.',
     'priceText should contain only the localized number expression itself and must not include any currency name, code, symbol, or unit.',
@@ -78,7 +79,7 @@ function buildMenuRecognitionSchema() {
       },
       currency: {
         type: 'string',
-        description: 'The currency code or symbol inferred from the menu, such as EUR, USD, JPY, CNY, $, or €. Return an empty string only if no currency can be inferred.',
+        description: 'Prefer a three-letter ISO 4217 code inferred from the menu, such as EUR, USD, JPY, or CNY. Return an empty string only if no currency can be inferred.',
       },
       items: {
         type: 'array',

@@ -16,8 +16,13 @@ function isMultiImageUploadEnabled() {
   return getMenuImageUploadLimit() > 1
 }
 
+function isExchangeRateReferenceEnabled() {
+  return Boolean(env.features && env.features.exchangeRateReferenceEnabled)
+}
+
 module.exports = {
   ABSOLUTE_MAX_MENU_IMAGE_COUNT,
   getMenuImageUploadLimit,
   isMultiImageUploadEnabled,
+  isExchangeRateReferenceEnabled,
 }
