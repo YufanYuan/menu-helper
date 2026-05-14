@@ -8,6 +8,7 @@ const DEFAULT_ENV = {
     forced: false,
     apiUrl: '',
     models: [],
+    thinking: 'disabled',
   },
   features: {
     menuUploadMaxCount: 1,
@@ -17,6 +18,7 @@ const DEFAULT_ENV = {
     baseUrl: '',
     model: '',
     apiKey: '',
+    thinking: 'disabled',
   },
 }
 
@@ -82,6 +84,7 @@ function applyEnv(nextConfig) {
 }
 
 function normalizeResponse(data) {
+  console.log("remote config:", data)
   if (!data || typeof data !== 'object') {
     throw new Error('配置接口返回格式异常')
   }

@@ -7,6 +7,35 @@ const DIRECT_VOLC_COUNTRIES = {
   RU: true,
 }
 
+const OPENROUTER_REASONING_EFFORTS = {
+  none: true,
+  minimal: true,
+  low: true,
+  medium: true,
+  high: true,
+  xhigh: true,
+}
+
+const OPENROUTER_REASONING_ALIASES = {
+  disabled: 'none',
+  off: 'none',
+  false: 'none',
+}
+
+const VOLC_THINKING_TYPES = {
+  disabled: true,
+  enabled: true,
+  auto: true,
+}
+
+const VOLC_THINKING_ALIASES = {
+  none: 'disabled',
+  off: 'disabled',
+  false: 'disabled',
+  on: 'enabled',
+  true: 'enabled',
+}
+
 function loginWithWeChat() {
   return new Promise((resolve, reject) => {
     wx.login({
@@ -142,6 +171,11 @@ function requestOpenRouterStructuredChatCompletion({
           data.max_tokens = config.maxTokens
         }
 
+        const reasoning = buildOpenRouterReasoning(config)
+        if (reasoning) {
+          data.reasoning = reasoning
+        }
+
         wx.request({
           url: config.apiUrl,
           method: 'POST',
@@ -198,12 +232,11 @@ function requestVolcEngineStructuredChatCompletion({
   }
 
   const normalizedInput = Array.isArray(input) && input.length ? input : toVolcInput(buildVolcMessages(messages))
+  const thinking = buildVolcThinking(config)
   const payload = {
     model: config.model,
     input: normalizedInput,
-    thinking: {
-      type: 'disabled',
-    },
+    thinking,
     text: {
       format: buildJsonSchemaFormat(schema, schemaName),
     },
@@ -266,6 +299,103 @@ function buildJsonSchemaFormat(schema, schemaName) {
     schema,
     strict: true,
   }
+}
+
+function normalizeThinkingLabel(value) {
+  if (typeof value === 'boolean') {
+    return value ? 'true' : 'false'
+  }
+
+  if (typeof value !== 'string') {
+    return ''
+  }
+
+  return value.trim().toLowerCase()
+}
+
+function pickThinkingLabel(thinking) {
+  if (!thinking || typeof thinking !== 'object' || Array.isArray(thinking)) {
+    return normalizeThinkingLabel(thinking)
+  }
+
+  return (
+    normalizeThinkingLabel(thinking.type) ||
+    normalizeThinkingLabel(thinking.effort) ||
+    normalizeThinkingLabel(thinking.level) ||
+    normalizeThinkingLabel(thinking.mode)
+  )
+}
+
+function buildOpenRouterReasoning(config) {
+  if (config.reasoning && typeof config.reasoning === 'object' && !Array.isArray(config.reasoning)) {
+    return config.reasoning
+  }
+
+  const thinking = config.thinking
+
+  if (thinking && typeof thinking === 'object' && !Array.isArray(thinking)) {
+    if (thinking.reasoning && typeof thinking.reasoning === 'object' && !Array.isArray(thinking.reasoning)) {
+      return thinking.reasoning
+    }
+
+    const reasoning = {}
+    const effort = normalizeOpenRouterEffort(pickThinkingLabel(thinking))
+    const maxTokens =
+      typeof thinking.max_tokens === 'number'
+        ? thinking.max_tokens
+        : thinking.maxTokens
+
+    if (typeof maxTokens === 'number' && maxTokens > 0) {
+      reasoning.max_tokens = maxTokens
+    } else if (effort) {
+      reasoning.effort = effort
+    } else if (shouldEnableOpenRouterReasoning(pickThinkingLabel(thinking))) {
+      reasoning.enabled = true
+    } else if (typeof thinking.enabled === 'boolean') {
+      reasoning.enabled = thinking.enabled
+    }
+
+    if (typeof thinking.exclude === 'boolean') {
+      reasoning.exclude = thinking.exclude
+    }
+
+    return Object.keys(reasoning).length ? reasoning : null
+  }
+
+  const effort = normalizeOpenRouterEffort(pickThinkingLabel(thinking))
+  if (effort) {
+    return { effort }
+  }
+
+  const label = pickThinkingLabel(thinking)
+  if (shouldEnableOpenRouterReasoning(label)) {
+    return { enabled: true }
+  }
+
+  return null
+}
+
+function normalizeOpenRouterEffort(value) {
+  const label = normalizeThinkingLabel(value)
+  const effort = OPENROUTER_REASONING_ALIASES[label] || label
+  return OPENROUTER_REASONING_EFFORTS[effort] ? effort : ''
+}
+
+function shouldEnableOpenRouterReasoning(value) {
+  const label = normalizeThinkingLabel(value)
+  return label === 'enabled' || label === 'auto' || label === 'on' || label === 'true'
+}
+
+function buildVolcThinking(config) {
+  const thinking = config.thinking
+  const label = pickThinkingLabel(thinking)
+  const type = VOLC_THINKING_ALIASES[label] || label
+
+  if (VOLC_THINKING_TYPES[type]) {
+    return { type }
+  }
+
+  return { type: 'disabled' }
 }
 
 function toVolcInput(messages) {

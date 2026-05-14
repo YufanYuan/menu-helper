@@ -18,6 +18,7 @@ export interface ChatCompletionRequest {
   stream?: boolean;
   temperature?: number;
   max_tokens?: number;
+  reasoning?: Record<string, unknown>;
   response_format?: Record<string, unknown>;
   provider?: Record<string, unknown>;
   structured_outputs?: boolean;
