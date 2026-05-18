@@ -1,7 +1,8 @@
 const sessionStore = require('../../store/session-store')
 const settingsStore = require('../../store/settings-store')
 const { ALL_CATEGORY, buildCategories, filterItemsByCategory, formatPrice } = require('../../domain/menu')
-const { hideShareMenu } = require('../../utils/share')
+const roomClient = require('../../services/room-client')
+const { buildRoomShareContent, showAppMessageShareMenu } = require('../../utils/share')
 const { trackEvent } = require('../../utils/analytics')
 
 const LANGUAGE_LABELS = {
@@ -38,6 +39,31 @@ Page({
     hasMenu: false,
     menuListHeight: 320,
     menuScrollTop: 0,
+    pendingRoomId: '',
+    roomId: '',
+    roomStatus: 'idle',
+    roomStatusText: '',
+    roomShareReady: false,
+    roomControlsDisabled: false,
+  },
+
+  onLoad(options) {
+    this.unsubscribeRoom = roomClient.subscribe(() => {
+      this.refreshData()
+    })
+
+    if (options && options.roomId) {
+      this.setData({
+        pendingRoomId: decodeURIComponent(options.roomId),
+      })
+    }
+  },
+
+  onUnload() {
+    if (this.unsubscribeRoom) {
+      this.unsubscribeRoom()
+      this.unsubscribeRoom = null
+    }
   },
 
   onReady() {
@@ -45,9 +71,14 @@ Page({
   },
 
   onShow() {
-    hideShareMenu()
+    showAppMessageShareMenu()
 
     const session = sessionStore.getState()
+    if (this.data.pendingRoomId && session.room.roomId !== this.data.pendingRoomId) {
+      this.joinSharedRoom(this.data.pendingRoomId)
+      return
+    }
+
     if (!session.items.length) {
       this.setData({
         hasMenu: false,
@@ -60,6 +91,11 @@ Page({
         totalCount: 0,
         totalPriceLabel: '0.00',
         menuScrollTop: 0,
+        roomId: '',
+        roomStatus: 'idle',
+        roomStatusText: '',
+        roomShareReady: false,
+        roomControlsDisabled: false,
       })
       trackEvent('menu_page_view', {
         has_menu: false,
@@ -71,6 +107,7 @@ Page({
 
     this.refreshData()
     this.updateMenuListHeight()
+    this.ensureRoomReady()
     const summary = sessionStore.getSummary()
     trackEvent('menu_page_view', {
       has_menu: true,
@@ -80,6 +117,15 @@ Page({
       cart_total_count: summary.totalCount,
       distinct_item_count: summary.cartItems.length,
     }, 'menu')
+  },
+
+  onShareAppMessage() {
+    const roomId = sessionStore.getState().room.roomId
+    trackEvent('share_room_app_message', {
+      share_channel: 'app_message',
+      room_ready: Boolean(roomId),
+    }, 'menu')
+    return buildRoomShareContent(roomId)
   },
 
   refreshData(nextCategory) {
@@ -93,7 +139,9 @@ Page({
       ...item,
       quantity: session.cart[item.id] || 0,
       priceLabel: formatPrice(item, session.currency),
+      attribution: session.attributions[item.id] || null,
     }))
+    const roomStatus = session.room.status || 'idle'
 
     this.setData({
       hasMenu: session.items.length > 0,
@@ -109,7 +157,79 @@ Page({
       menuScrollTop: this.data.menuScrollTop,
       imagePaths: session.imagePaths,
       imageCount: session.imagePaths.length,
+      roomId: session.room.roomId,
+      roomStatus,
+      roomStatusText: buildRoomStatusText(roomStatus, session.room.lastError),
+      roomShareReady: Boolean(session.room.roomId),
+      roomControlsDisabled: Boolean(session.room.roomId) && roomStatus !== 'connected',
     }, () => this.updateMenuListHeight())
+  },
+
+  ensureRoomReady() {
+    const session = sessionStore.getState()
+    if (!session.items.length || session.room.roomId || session.room.status === 'connecting') {
+      return
+    }
+
+    roomClient.connectCreateRoom({
+      menuLanguage: session.menuLanguage,
+      currency: session.currency,
+      items: session.items,
+    }, session.cart).then(() => {
+      this.refreshData()
+      trackEvent('room_create_success', {
+        room_id: sessionStore.getState().room.roomId,
+      }, 'menu')
+    }).catch((error) => {
+      this.refreshData()
+      trackEvent('room_create_fail', {
+        error_message: error.message || '房间创建失败',
+      }, 'menu')
+      wx.showToast({
+        title: error.message || '房间创建失败',
+        icon: 'none',
+      })
+    })
+  },
+
+  joinSharedRoom(roomId) {
+    if (!roomId) {
+      return
+    }
+
+    this.setData({
+      pendingRoomId: roomId,
+      hasMenu: true,
+      roomStatus: 'connecting',
+      roomStatusText: '正在加入点餐房间',
+      roomControlsDisabled: true,
+    })
+
+    roomClient.connectJoinRoom(roomId).then(() => {
+      this.setData({ pendingRoomId: '' })
+      this.refreshData()
+      trackEvent('room_join_success', {
+        room_id: roomId,
+      }, 'menu')
+    }).catch((error) => {
+      this.refreshData()
+      trackEvent('room_join_fail', {
+        room_id: roomId,
+        error_message: error.message || '加入房间失败',
+      }, 'menu')
+      wx.showModal({
+        title: '房间不可用',
+        content: error.message || '点餐房间已失效，请让朋友重新分享。',
+        confirmText: '回到首页',
+        showCancel: false,
+        success: () => {
+          sessionStore.clearSession()
+          wx.reLaunch({
+            url: '/pages/home/index',
+          })
+        },
+      })
+    })
   },
 
   handleCategoryTap(event) {
@@ -126,13 +246,42 @@ Page({
     this.refreshData(nextCategory)
   },
 
+  handleInviteTap() {
+    roomClient.prepareMemberProfile().then(() => {
+      const session = sessionStore.getState()
+      if (!session.room.roomId) {
+        this.ensureRoomReady()
+      }
+    })
+  },
+
   handleQuantityChange(event) {
     const { itemId, value } = event.detail
     const session = sessionStore.getState()
     const previousQuantity = Number(session.cart[itemId] || 0)
-    sessionStore.updateQuantity(itemId, value)
-    this.syncQuantityState(itemId, value)
-    trackCartChange(itemId, previousQuantity, value)
+    const nextQuantity = Math.max(0, Number(value) || 0)
+
+    if (session.room.roomId) {
+      if (session.room.status !== 'connected') {
+        wx.showToast({
+          title: '房间重连中，暂时不能修改',
+          icon: 'none',
+        })
+        return
+      }
+
+      roomClient.adjustItemQuantity(itemId, nextQuantity - previousQuantity).catch((error) => {
+        wx.showToast({
+          title: error.message || '同步失败',
+          icon: 'none',
+        })
+      })
+      return
+    }
+
+    sessionStore.updateQuantity(itemId, nextQuantity)
+    this.syncQuantityState(itemId, nextQuantity)
+    trackCartChange(itemId, previousQuantity, nextQuantity)
   },
 
   handlePreview() {
@@ -184,6 +333,7 @@ Page({
           cart_total_count: this.data.totalCount,
           recognized_item_count: sessionStore.getState().items.length,
         }, 'menu')
+        roomClient.closeSocket(true)
         sessionStore.clearSession()
         navigateBackOrHome()
       },
@@ -271,6 +421,22 @@ function formatLanguageLabel(value) {
   }
 
   return LANGUAGE_LABELS[label.toLowerCase()] || label
+}
+
+function buildRoomStatusText(status, lastError) {
+  if (status === 'connected') {
+    return '多人点餐已同步'
+  }
+  if (status === 'connecting') {
+    return '正在创建点餐房间'
+  }
+  if (status === 'reconnecting') {
+    return '房间重连中'
+  }
+  if (status === 'error') {
+    return lastError || '房间同步不可用'
+  }
+  return ''
 }
 
 function parsePriceLabel(value) {

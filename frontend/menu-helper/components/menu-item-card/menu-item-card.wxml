@@ -12,7 +12,10 @@
   <view class="menu-card-bottom">
     <view class="menu-meta">
       <text class="menu-category">{{item.translatedCategory}}</text>
+      <view wx:if="{{attribution}}" class="attribution-avatar" style="background: {{attribution.avatarColor || '#182126'}};">
+        <image wx:if="{{attribution.avatarUrl}}" class="attribution-image" src="{{attribution.avatarUrl}}" mode="aspectFill"></image>
+      </view>
     </view>
-    <quantity-stepper value="{{quantity}}" bind:change="handleQuantityChange"></quantity-stepper>
+    <quantity-stepper value="{{quantity}}" disabled="{{disabled}}" bind:change="handleQuantityChange"></quantity-stepper>
   </view>
 </view>

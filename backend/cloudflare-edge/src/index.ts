@@ -2,6 +2,7 @@ import type { Env } from './types/env';
 import { handleRequest } from './app';
 import { createRuntimeContext } from './services/runtime';
 import { createRequestLogger, serializeError } from './services/logger';
+export { MenuRoomObject } from './durableObjects/menuRoom';
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {

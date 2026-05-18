@@ -10,6 +10,14 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 binding = "USAGE_DATASET"
 dataset = "menu_translate_analytics"
 
+[[durable_objects.bindings]]
+name = "MENU_ROOM_OBJECT"
+class_name = "MenuRoomObject"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["MenuRoomObject"]
+
 [observability]
 [observability.logs]
 enabled = true

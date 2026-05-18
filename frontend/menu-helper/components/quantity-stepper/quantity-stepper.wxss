@@ -21,6 +21,10 @@
   color: #fffaf0;
 }
 
+.stepper.disabled {
+  opacity: 0.46;
+}
+
 .stepper-value {
   min-width: 72rpx;
   height: 68rpx;

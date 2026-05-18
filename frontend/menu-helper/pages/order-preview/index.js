@@ -1,5 +1,6 @@
 const sessionStore = require('../../store/session-store')
 const { formatPrice } = require('../../domain/menu')
+const roomClient = require('../../services/room-client')
 const { hideShareMenu } = require('../../utils/share')
 const { trackEvent } = require('../../utils/analytics')
 
@@ -9,6 +10,20 @@ Page({
     totalCount: 0,
     totalPriceLabel: '0.00',
     currency: '',
+    roomControlsDisabled: false,
+  },
+
+  onLoad() {
+    this.unsubscribeRoom = roomClient.subscribe(() => {
+      this.refreshData()
+    })
+  },
+
+  onUnload() {
+    if (this.unsubscribeRoom) {
+      this.unsubscribeRoom()
+      this.unsubscribeRoom = null
+    }
   },
 
   onShow() {
@@ -34,19 +49,40 @@ Page({
       totalCount: summary.totalCount,
       totalPriceLabel: buildTotalPriceLabel(summary.totalPrice, session.currency),
       currency: session.currency,
+      roomControlsDisabled: Boolean(session.room.roomId) && session.room.status !== 'connected',
     })
   },
 
   handleQuantityChange(event) {
     const itemId = event.currentTarget.dataset.itemId
-    const previousQuantity = Number(sessionStore.getState().cart[itemId] || 0)
-    sessionStore.updateQuantity(itemId, event.detail.value)
+    const session = sessionStore.getState()
+    const previousQuantity = Number(session.cart[itemId] || 0)
+    const nextQuantity = Math.max(0, Number(event.detail.value) || 0)
+
+    if (session.room.roomId) {
+      if (session.room.status !== 'connected') {
+        wx.showToast({
+          title: '房间重连中，暂时不能修改',
+          icon: 'none',
+        })
+        return
+      }
+
+      roomClient.adjustItemQuantity(itemId, nextQuantity - previousQuantity).catch((error) => {
+        wx.showToast({
+          title: error.message || '同步失败',
+          icon: 'none',
+        })
+      })
+      return
+    }
+
+    sessionStore.updateQuantity(itemId, nextQuantity)
     this.refreshData()
     const summary = sessionStore.getSummary()
     const item = summary.cartItems.find((cartItem) => cartItem.id === itemId)
       || sessionStore.getState().items.find((currentItem) => currentItem.id === itemId)
       || {}
-    const nextQuantity = Number(event.detail.value) || 0
 
     trackEvent('order_preview_item_update', {
       item_id: itemId,

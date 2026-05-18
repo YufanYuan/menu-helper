@@ -19,6 +19,7 @@
             </view>
             <quantity-stepper
               value="{{item.quantity}}"
+              disabled="{{roomControlsDisabled}}"
               data-item-id="{{item.id}}"
               bind:change="handleQuantityChange"
             ></quantity-stepper>

@@ -14,8 +14,19 @@
           <text class="section-title">菜单识别完成</text>
           <text class="section-subtitle">原文：{{menuLanguageLabel}} · 翻译：{{userLanguage}}</text>
           <text wx:if="{{imageCount > 1}}" class="summary-subtitle-extra">已合并 {{imageCount}} 张菜单照片</text>
+          <text wx:if="{{roomStatusText}}" class="summary-subtitle-extra">{{roomStatusText}}</text>
         </view>
-        <image wx:if="{{imagePath}}" class="summary-image" src="{{imagePath}}" mode="aspectFill"></image>
+        <view class="summary-actions">
+          <button
+            class="share-room-button {{roomShareReady ? '' : 'disabled'}}"
+            open-type="share"
+            disabled="{{!roomShareReady}}"
+            bindtap="handleInviteTap"
+          >
+            邀请
+          </button>
+          <image wx:if="{{imagePath}}" class="summary-image" src="{{imagePath}}" mode="aspectFill"></image>
+        </view>
       </view>
 
       <scroll-view
@@ -43,7 +54,13 @@
         class="menu-list"
       >
         <block wx:for="{{items}}" wx:key="id">
-          <menu-item-card item="{{item}}" quantity="{{item.quantity}}" bind:quantitychange="handleQuantityChange"></menu-item-card>
+          <menu-item-card
+            item="{{item}}"
+            quantity="{{item.quantity}}"
+            attribution="{{item.attribution}}"
+            disabled="{{roomControlsDisabled}}"
+            bind:quantitychange="handleQuantityChange"
+          ></menu-item-card>
         </block>
       </scroll-view>
 

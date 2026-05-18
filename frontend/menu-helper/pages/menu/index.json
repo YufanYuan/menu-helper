@@ -1,4 +1,5 @@
 {
+  "enableShareAppMessage": true,
   "usingComponents": {
     "navigation-bar": "/components/navigation-bar/navigation-bar",
     "menu-item-card": "/components/menu-item-card/menu-item-card",

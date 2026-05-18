@@ -1,5 +1,6 @@
 const sessionStore = require('../../store/session-store')
 const settingsStore = require('../../store/settings-store')
+const roomClient = require('../../services/room-client')
 const { hideShareMenu } = require('../../utils/share')
 const { trackEvent } = require('../../utils/analytics')
 
@@ -14,6 +15,19 @@ Page({
     switchOptions,
     items: [],
     orderSummaryText: '',
+  },
+
+  onLoad() {
+    this.unsubscribeRoom = roomClient.subscribe(() => {
+      this.refreshData()
+    })
+  },
+
+  onUnload() {
+    if (this.unsubscribeRoom) {
+      this.unsubscribeRoom()
+      this.unsubscribeRoom = null
+    }
   },
 
   onShow() {

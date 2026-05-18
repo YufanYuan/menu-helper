@@ -8,6 +8,14 @@ Component({
       type: Number,
       value: 0,
     },
+    attribution: {
+      type: Object,
+      value: null,
+    },
+    disabled: {
+      type: Boolean,
+      value: false,
+    },
   },
 
   methods: {

@@ -26,5 +26,5 @@ Docker:
 
 ```bash
 docker build -f backend/cn-backend/Dockerfile -t menu-helper-cn-backend .
-docker run --rm -p 8000:8000 menu-helper-cn-backend
+docker run --rm --env-file .env -p 8000:8000 menu-helper-cn-backend
 ```

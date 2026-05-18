@@ -13,6 +13,11 @@ const DEFAULT_ENV = {
   features: {
     menuUploadMaxCount: 1,
   },
+  rooms: {
+    socketUrl: '',
+    cnSocketUrl: '',
+    cloudflareSocketUrl: '',
+  },
   volcengine: {
     forced: false,
     baseUrl: '',
@@ -78,6 +83,7 @@ function applyEnv(nextConfig) {
   env.requestTimeout = Number(merged.requestTimeout) || DEFAULT_ENV.requestTimeout
   env.cloudflare = mergeDeep(DEFAULT_ENV.cloudflare, merged.cloudflare)
   env.features = mergeDeep(DEFAULT_ENV.features, merged.features)
+  env.rooms = mergeDeep(DEFAULT_ENV.rooms, merged.rooms)
   env.volcengine = mergeDeep(DEFAULT_ENV.volcengine, merged.volcengine)
 
   return env

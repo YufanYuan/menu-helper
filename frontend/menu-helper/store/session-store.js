@@ -12,6 +12,14 @@ const defaultState = {
   currency: '',
   items: [],
   cart: {},
+  attributions: {},
+  room: {
+    roomId: '',
+    memberId: '',
+    status: 'idle',
+    lastError: '',
+    version: 0,
+  },
   recognitionStatus: 'idle',
   recognizedAt: '',
 }
@@ -34,6 +42,8 @@ function getState() {
     images: state.images.map((image) => Object.assign({}, image)),
     items: state.items.slice(),
     cart: Object.assign({}, state.cart),
+    attributions: Object.assign({}, state.attributions),
+    room: Object.assign({}, state.room),
   }
 }
 
@@ -77,6 +87,7 @@ function setMenuResult(payload) {
     currency: payload.currency,
     items: payload.items,
     cart: initialCart,
+    attributions: {},
     recognitionStatus: 'ready',
     recognizedAt: new Date().toISOString(),
   })
@@ -87,6 +98,69 @@ function setMenuResult(payload) {
 function updateQuantity(itemId, quantity) {
   state = Object.assign({}, state, {
     cart: setItemQuantity(state.cart, itemId, quantity),
+  })
+  persist()
+  return getState()
+}
+
+function setRoomStatus(status, lastError) {
+  state = Object.assign({}, state, {
+    room: Object.assign({}, state.room, {
+      status,
+      lastError: lastError || '',
+    }),
+  })
+  persist()
+  return getState()
+}
+
+function applyRoomSnapshot(snapshot, memberId, status) {
+  if (!snapshot || !snapshot.menu || !Array.isArray(snapshot.menu.items)) {
+    return getState()
+  }
+
+  state = Object.assign({}, state, {
+    menuLanguage: snapshot.menu.menuLanguage,
+    currency: snapshot.menu.currency,
+    items: snapshot.menu.items,
+    cart: Object.assign({}, snapshot.cart || {}),
+    attributions: Object.assign({}, snapshot.attributions || {}),
+    recognitionStatus: 'ready',
+    recognizedAt: snapshot.createdAt || state.recognizedAt || new Date().toISOString(),
+    room: Object.assign({}, state.room, {
+      roomId: snapshot.roomId || state.room.roomId,
+      memberId: memberId || state.room.memberId,
+      status: status || state.room.status || 'connected',
+      lastError: '',
+      version: Number(snapshot.version) || state.room.version || 0,
+    }),
+  })
+  persist()
+  return getState()
+}
+
+function applyRoomCartUpdate(payload) {
+  if (!payload || !payload.roomId || payload.roomId !== state.room.roomId) {
+    return getState()
+  }
+
+  state = Object.assign({}, state, {
+    cart: Object.assign({}, payload.cart || {}),
+    attributions: Object.assign({}, payload.attributions || {}),
+    room: Object.assign({}, state.room, {
+      status: 'connected',
+      lastError: '',
+      version: Number(payload.version) || state.room.version,
+    }),
+  })
+  persist()
+  return getState()
+}
+
+function clearRoom() {
+  state = Object.assign({}, state, {
+    attributions: {},
+    room: Object.assign({}, defaultState.room),
   })
   persist()
   return getState()
@@ -108,6 +182,10 @@ module.exports = {
   setRecognitionStatus,
   setMenuResult,
   updateQuantity,
+  setRoomStatus,
+  applyRoomSnapshot,
+  applyRoomCartUpdate,
+  clearRoom,
   clearSession,
   getSummary,
 }

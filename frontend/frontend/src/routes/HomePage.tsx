@@ -1,39 +1,64 @@
-import { Link } from '@tanstack/react-router';
+const menuMiniappQrUrl = new URL(
+  '../../statics/imgs/menu-miniapp-qr.png',
+  import.meta.url,
+).href;
 
-const focusAreas = [
-  'Product engineering',
-  'AI-native tooling',
-  'Edge and mini program systems',
+const apps = [
+  {
+    title: "Texas Hold'em",
+    description: '德州扑克 with on-device AI players',
+  },
+  {
+    title: '菜单拍照小程序',
+    description: '拍照识别菜单，快速整理点单。',
+    imageUrl: menuMiniappQrUrl,
+    imageAlt: '菜单拍照小程序码',
+  },
 ];
 
 export function HomePage() {
   return (
-    <main>
-      <section className="hero">
-        <div className="hero-copy">
-          <p className="eyebrow">Builder, product engineer, systems thinker</p>
-          <h1>Yufan</h1>
-          <p className="lede">
-            I build focused software that makes everyday workflows lighter, faster, and easier to trust.
-          </p>
-          <div className="hero-actions" aria-label="Profile links">
-            <a href="mailto:hello@example.com">Email</a>
-            <Link to="/work">Work</Link>
-          </div>
-        </div>
+    <main className="home-page">
+      <div className="home-content">
+        <section className="intro" aria-labelledby="profile-title">
+          <p className="eyebrow">Personal homepage</p>
+          <h1 id="profile-title">I'm Frank Yuan</h1>
+        </section>
 
-        <aside className="profile-panel" aria-label="Current focus">
-          <div className="profile-image" />
-          <div>
-            <p className="panel-label">Current focus</p>
-            <ul>
-              {focusAreas.map((area) => (
-                <li key={area}>{area}</li>
-              ))}
-            </ul>
-          </div>
-        </aside>
-      </section>
+        <section className="app-grid" aria-label="Portfolio">
+          {apps.map((app) => (
+            <article className="app-card" key={app.title}>
+              {app.imageUrl ? (
+                <img className="app-qr" src={app.imageUrl} alt={app.imageAlt} />
+              ) : (
+                <div className="poker-mark" aria-hidden="true">
+                  AI
+                </div>
+              )}
+              <div>
+                <h2>{app.title}</h2>
+                <p>{app.description}</p>
+              </div>
+            </article>
+          ))}
+        </section>
+      </div>
+
+      <footer className="beian-footer" aria-label="备案信息">
+        <p className="police-beian">
+          <img alt="" aria-hidden="true" src="/assets/image/head-logo.png" width="20" />
+          <a
+            href="https://beian.mps.gov.cn/#/query/webSearch?code=31011002004975"
+            rel="noreferrer"
+            target="_blank"
+          >
+            沪公网安备31011002004975号
+          </a>
+        </p>
+        <a href="https://beian.miit.gov.cn/" rel="noreferrer" target="_blank">
+          沪ICP备20003331号-1
+        </a>
+      </footer>
     </main>
   );
 }

@@ -1,10 +1,4 @@
-import {
-  Link,
-  Outlet,
-  createRootRoute,
-  createRoute,
-  createRouter,
-} from '@tanstack/react-router';
+import { Outlet, createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
 
 import { HomePage } from './routes/HomePage';
 import { WorkPage } from './routes/WorkPage';
@@ -12,19 +6,6 @@ import { WorkPage } from './routes/WorkPage';
 function RootLayout() {
   return (
     <div className="app-shell">
-      <header className="site-header">
-        <Link className="brand" to="/">
-          Yufan
-        </Link>
-        <nav className="site-nav" aria-label="Primary">
-          <Link activeProps={{ className: 'active' }} to="/">
-            Home
-          </Link>
-          <Link activeProps={{ className: 'active' }} to="/work">
-            Work
-          </Link>
-        </nav>
-      </header>
       <Outlet />
     </div>
   );

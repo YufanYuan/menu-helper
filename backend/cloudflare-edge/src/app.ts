@@ -1,6 +1,7 @@
 import type { Env } from './types/env';
 import type { RuntimeContext } from './types/runtime';
 import { handleChatCompletions } from './routes/chatCompletions';
+import { handleRoomsWebSocket } from './routes/rooms';
 import { createRuntimeContext } from './services/runtime';
 
 function jsonNotFound(): Response {
@@ -27,6 +28,10 @@ export async function handleRequest(
   runtimeContext: RuntimeContext = createRuntimeContext(request, env),
 ): Promise<Response> {
   const url = new URL(request.url);
+
+  if (request.method === 'GET' && url.pathname === '/ws/rooms') {
+    return handleRoomsWebSocket(request, env);
+  }
 
   if (request.method === 'POST' && url.pathname === '/api/chat/completions') {
     return handleChatCompletions(request, env, runtimeContext);

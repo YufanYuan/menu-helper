@@ -3,8 +3,10 @@
 该目录实现了面向微信小程序的后端 MVP，业务逻辑默认走通用 Web Fetch 接口，平台能力按 runtime 注入：
 
 - `POST /api/chat/completions`
+- `GET /ws/rooms` WebSocket room endpoint for shared menu ordering
 - 基于 `wechat_code` 调用微信 `code2Session` 获取用户 `openid`
 - 转发 OpenRouter chat completions（当前仅支持 `stream: false`）
+- 使用 Durable Object 托管国际版点餐房间状态
 - 在 Cloudflare Worker 环境中，自动启用 Analytics Engine 并写入 usage/cost/地区/状态/时延，并关联 `session_id` / `client_request_id`
 - 在非 Cloudflare 环境中，可复用同一套 handler，并按需注入自己的 analytics/logger/storage 能力
 - 该接口当前仅服务国际流量；中国大陆/俄罗斯用户由小程序端直接请求火山引擎豆包模型
@@ -15,8 +17,11 @@
 src/
   app.ts
   index.ts
+  durableObjects/
+    menuRoom.ts
   routes/
     chatCompletions.ts
+    rooms.ts
   services/
     wechat.ts
     openrouter.ts
@@ -39,7 +44,10 @@ src/
 `wrangler.toml` 中当前默认配置了 Cloudflare Worker 部署参数：
 
 - `OPENROUTER_BASE_URL=https://openrouter.ai/api/v1`
+- `MENU_ROOM_OBJECT` Durable Object binding
 - `USAGE_DATASET` Analytics Engine binding（可选，仅 Cloudflare runtime 使用）
+
+`/ws/rooms` 只通过 WebSocket 工作。创建房间时直接连接该路径并发送 `create_room`；加入房间时连接同一路径并附加 `?roomId=...`，首条消息仍需发送 `join_room` 完成微信 code 校验。
 
 ## 本地开发
 

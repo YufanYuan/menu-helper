@@ -35,6 +35,28 @@ page {
   flex: 1;
 }
 
+.summary-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.share-room-button {
+  width: 112rpx;
+  height: 64rpx;
+  padding: 0;
+  border-radius: 999rpx;
+  background: #182126;
+  color: #fffaf0;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.share-room-button.disabled {
+  opacity: 0.5;
+}
+
 .summary-subtitle-extra {
   display: block;
   margin-top: 12rpx;

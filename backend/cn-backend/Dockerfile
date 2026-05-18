@@ -1,5 +1,8 @@
 FROM python:3.12-slim
 
+# Build from the repository root:
+# docker build -f backend/cn-backend/Dockerfile -t menu-helper-cn-backend .
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     UV_COMPILE_BYTECODE=1 \
@@ -9,7 +12,7 @@ COPY --from=ghcr.io/astral-sh/uv:0.5.31 /uv /uvx /bin/
 
 WORKDIR /app
 
-COPY pyproject.toml uv.toml .python-version ./
+COPY pyproject.toml uv.toml uv.lock .python-version ./
 COPY backend/cn-backend ./backend/cn-backend
 
 RUN uv sync --package menu-helper-cn-backend --no-dev
